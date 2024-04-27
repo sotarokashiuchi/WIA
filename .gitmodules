@@ -1,0 +1,3 @@
+[submodule "Schematic Diagram/lib/Rasberry-pi-3"]
+	path = Schematic Diagram/lib/Rasberry-pi-3
+	url = https://github.com/lucahttp/Raspberry-Pi-3-library-for-kicad.git
