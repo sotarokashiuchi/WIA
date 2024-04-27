@@ -1,0 +1,5 @@
+(sym_lib_table
+  (lib (name "raspberrypi")(type "Legacy")(uri "${KIPRJMOD}/lib/Rasberry-pi-3/Raspberry_Pi_2_or_3.lib")(options "")(descr ""))
+  (lib (name "rc522")(type "Legacy")(uri "${KIPRJMOD}/lib/KiCad/RC522_rfid_reader/RC522_rfid_reader_lib/rc522.lib")(options "")(descr ""))
+  (lib (name "project")(type "KiCad")(uri "${KIPRJMOD}/lib/project.kicad_sym")(options "")(descr ""))
+)
