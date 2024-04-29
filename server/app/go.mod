@@ -2,7 +2,10 @@ module example.com/m
 
 go 1.21.0
 
-require github.com/labstack/echo/v4 v4.12.0
+require (
+	github.com/labstack/echo/v4 v4.12.0
+	golang.org/x/tools v0.6.0
+)
 
 require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
