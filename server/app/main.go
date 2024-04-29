@@ -26,7 +26,7 @@ type Attendance struct {
 	Name      string    `json:"name"`
 	TimeStart time.Time `json:"timeStart"`
 	TimeGoal  time.Time `json:"timeGoal"`
-	User      []User    `json:"user"`
+	Users     []User    `json:"user"`
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
@@ -38,50 +38,51 @@ func main() {
 	t := &Template{
 		templates: template.Must(template.ParseGlob("views/*.html")),
 	}
-  // Echo instance
-  e := echo.New()
-	e.Renderer = t;
+	// Echo instance
+	e := echo.New()
+	e.Renderer = t
 
-  // Middleware
-  e.Use(middleware.Logger())
-  e.Use(middleware.Recover())
+	// Middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
-  // Routes
-  e.GET("/", hello)
-  e.GET("/list", list)
+	// Routes
+	e.GET("/", hello)
+	e.GET("/list", list)
 
-  // Start server
-  e.Logger.Fatal(e.Start(":1323"))
+	// Start server
+	e.Logger.Fatal(e.Start(":1323"))
 }
 
 // Handler
 func hello(c echo.Context) error {
-  return c.String(http.StatusOK, "Hello, World!")
+	return c.String(http.StatusOK, "Hello, World!")
 }
 
 func list(c echo.Context) error {
-	return c.Render(http.StatusOK, "hello", "This is First Page")
+	// IDが指定されてくる
+	return c.Render(http.StatusOK, "list", "This is First Page")
 }
 
 func createDB() {
-		attendance := []Attendance{
-			{
-				Id: 0,
-				Name: "点呼",
-				TimeStart: time.Date(2024, 04, 29, 23, 8, 2, 0, &time.Location{}),
-				TimeGoal: time.Date(2024, 04, 29, 24, 8, 2, 0, &time.Location{}),
-				User: []User{{1, "sotaro"}, {2, "sok"}},
-			},
-			{
-				Id: 1,
-				Name: "コンピュータ部出席確認",
-				TimeStart: time.Date(2024, 04, 30, 23, 8, 2, 0, &time.Location{}),
-				TimeGoal: time.Date(2024, 04, 30, 24, 8, 2, 0, &time.Location{}),
-				User: []User{{1, "sotaro"}, {2, "sok"}},
-			},
-		}
+	attendances := []Attendance{
+		{
+			Id:        0,
+			Name:      "点呼",
+			TimeStart: time.Date(2024, 04, 29, 23, 8, 2, 0, &time.Location{}),
+			TimeGoal:  time.Date(2024, 04, 29, 24, 8, 2, 0, &time.Location{}),
+			Users:     []User{{1, "sotaro"}, {2, "sok"}},
+		},
+		{
+			Id:        1,
+			Name:      "コンピュータ部出席確認",
+			TimeStart: time.Date(2024, 04, 30, 23, 8, 2, 0, &time.Location{}),
+			TimeGoal:  time.Date(2024, 04, 30, 24, 8, 2, 0, &time.Location{}),
+			Users:     []User{{1, "sotaro"}, {2, "sok"}},
+		},
+	}
 
-	file, err := os.Create("attendance.json")
+	file, err := os.Create("attendances.json")
 	if err != nil {
 		return
 	}
@@ -89,7 +90,7 @@ func createDB() {
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
-	if err := encoder.Encode(attendance); err != nil {
+	if err := encoder.Encode(attendances); err != nil {
 		return
 	}
 	return
