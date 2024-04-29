@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"io"
 	"net/http"
@@ -61,7 +62,32 @@ func hello(c echo.Context) error {
 
 func list(c echo.Context) error {
 	// IDが指定されてくる
-	return c.Render(http.StatusOK, "list", "This is First Page")
+	x := 1
+	attendances := loadAttendanceDB()
+	fmt.Print("\n\n")
+	fmt.Print(*loadAttendanceDB())
+	fmt.Print("\n\n")
+	for _, attendance := range *attendances {
+		if attendance.Id == x {
+			return c.Render(http.StatusOK, "list", attendance)
+		}
+	}
+	return c.Render(http.StatusOK, "404.html", "This is First Page")
+}
+
+func loadAttendanceDB() *[]Attendance {
+	file, err := os.Open("./db/attendances.json")
+	if err != nil {
+		return nil
+	}
+	defer file.Close()
+
+	var attendances []Attendance
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&attendances); err != nil {
+		return nil
+	}
+	return &attendances
 }
 
 func createDB() {
@@ -82,7 +108,7 @@ func createDB() {
 		},
 	}
 
-	file, err := os.Create("attendances.json")
+	file, err := os.Create("./db/attendances.json")
 	if err != nil {
 		return
 	}
