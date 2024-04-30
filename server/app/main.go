@@ -13,6 +13,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"golang.org/x/exp/slices"
 )
 
 type Template struct {
@@ -52,8 +53,10 @@ func main() {
 
 	// Routes
 	e.GET("/", hello)
-	e.GET("/attendance/list", attendanceList)
-	e.GET("/attendance/select", attendanceSelect)
+	e.GET("/attendance/list", attendanceListGET)
+	e.GET("/attendance/select", attendanceSelectGET)
+	e.GET("/attendance/new", attendanceNewGET)
+	e.POST("/attendance/new", attendanceNewPOST)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
@@ -64,12 +67,27 @@ func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello, World!")
 }
 
-func attendanceSelect(c echo.Context) error {
+func attendanceNewGET(c echo.Context) error {
+	attendances := loadAttendanceDB()
+	var attendanceNameList []string
+
+	for _, attendance := range *attendances {
+		attendanceNameList = append(attendanceNameList, attendance.Name)
+	}
+
+	sort.Slice(attendanceNameList, func(i, j int) bool {
+		return attendanceNameList[i] < attendanceNameList[j]
+	})
+
+	return c.Render(http.StatusOK, "attendanceNew", slices.Compact(attendanceNameList))
+}
+
+func attendanceSelectGET(c echo.Context) error {
 	attendances := loadAttendanceDB()
 	return c.Render(http.StatusOK, "attendanceSelect", *attendances)
 }
 
-func attendanceList(c echo.Context) error {
+func attendanceListGET(c echo.Context) error {
 	id, err := strconv.Atoi(c.QueryParam(("id")))
 	if err != nil {
 		return c.Render(http.StatusOK, "404.html", "Cant't to Found Page")
@@ -118,6 +136,13 @@ func createDB() {
 			Name:      "コンピュータ部出席確認",
 			TimeStart: time.Date(2024, 04, 30, 23, 8, 2, 0, &time.Location{}),
 			TimeGoal:  time.Date(2024, 04, 30, 24, 8, 2, 0, &time.Location{}),
+			Users:     []User{{1, "sotaro"}, {2, "sok"}},
+		},
+		{
+			Id:        2,
+			Name:      "点呼",
+			TimeStart: time.Date(2024, 05, 01, 0, 0, 0, 0, &time.Location{}),
+			TimeGoal:  time.Date(2024, 05, 01, 23, 8, 2, 0, &time.Location{}),
 			Users:     []User{{1, "sotaro"}, {2, "sok"}},
 		},
 	}
