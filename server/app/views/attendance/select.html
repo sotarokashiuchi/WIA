@@ -1,0 +1,26 @@
+{{define "attendanceSelect"}}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Title</title>
+        <meta charset="utf-8" />
+    </head>
+    <body>
+        <h1>出席パラメータ選択</h1>
+        <table>
+            <tr><th>ID:名前</th><th>開始時刻</th><th>終了時刻</th></tr>
+            {{ range . }}
+                <tr>
+                    <td>
+                        <a href="/attendance/list?id={{ .Id }}">
+                            {{ .Id }}:{{ .Name }}
+                        </a>
+                    </td>
+                    <td>{{ .TimeStart }}</td>
+                    <td>{{ .TimeGoal }}</td>
+                </tr>
+            {{ end }}
+        </table>
+    </body>
+</html>
+{{end}}

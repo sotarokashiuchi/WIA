@@ -7,6 +7,8 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"sort"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -35,9 +37,10 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 }
 
 func main() {
+	fmt.Print("\n\n")
 	createDB()
 	t := &Template{
-		templates: template.Must(template.ParseGlob("views/*.html")),
+		templates: template.Must(template.ParseGlob("views/*/*.html")),
 	}
 	// Echo instance
 	e := echo.New()
@@ -49,7 +52,8 @@ func main() {
 
 	// Routes
 	e.GET("/", hello)
-	e.GET("/list", list)
+	e.GET("/attendance/list", attendanceList)
+	e.GET("/attendance/select", attendanceSelect)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
@@ -60,16 +64,21 @@ func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello, World!")
 }
 
-func list(c echo.Context) error {
-	// IDが指定されてくる
-	x := 1
+func attendanceSelect(c echo.Context) error {
 	attendances := loadAttendanceDB()
-	fmt.Print("\n\n")
-	fmt.Print(*loadAttendanceDB())
-	fmt.Print("\n\n")
+	return c.Render(http.StatusOK, "attendanceSelect", *attendances)
+}
+
+func attendanceList(c echo.Context) error {
+	id, err := strconv.Atoi(c.QueryParam(("id")))
+	if err != nil {
+		return c.Render(http.StatusOK, "404.html", "Cant't to Found Page")
+	}
+
+	attendances := loadAttendanceDB()
 	for _, attendance := range *attendances {
-		if attendance.Id == x {
-			return c.Render(http.StatusOK, "list", attendance)
+		if attendance.Id == id {
+			return c.Render(http.StatusOK, "attendanceList", attendance)
 		}
 	}
 	return c.Render(http.StatusOK, "404.html", "This is First Page")
@@ -87,6 +96,11 @@ func loadAttendanceDB() *[]Attendance {
 	if err := decoder.Decode(&attendances); err != nil {
 		return nil
 	}
+
+	sort.Slice(attendances, func(i, j int) bool {
+		return attendances[i].Id > attendances[j].Id
+	})
+	
 	return &attendances
 }
 
