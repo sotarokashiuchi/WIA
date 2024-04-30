@@ -82,6 +82,20 @@ func attendanceNewGET(c echo.Context) error {
 	return c.Render(http.StatusOK, "attendanceNew", slices.Compact(attendanceNameList))
 }
 
+func attendanceNewPOST(c echo.Context) error {
+	// ToDo: 出席管理実施時刻が被っていないか検証
+	dateStart, _ := time.Parse("2006-01-02T15:04:05Z07:00", c.FormValue("dateStart")+"T"+c.FormValue("timeStart")+":00+"+"00:00")
+	dateGoal, _ := time.Parse("2006-01-02T15:04:05Z07:00", c.FormValue("dateGoal")+"T"+c.FormValue("timeGoal")+":00+"+"00:00")
+	id := insertDB(
+		Attendance{
+			Name:      c.FormValue("name"),
+			TimeStart: dateStart,
+			TimeGoal:  dateGoal,
+		},
+	)
+	return c.Render(http.StatusOK, "attendanceCompleted", id)
+}
+
 func attendanceSelectGET(c echo.Context) error {
 	attendances := loadAttendanceDB()
 	return c.Render(http.StatusOK, "attendanceSelect", *attendances)
@@ -118,8 +132,27 @@ func loadAttendanceDB() *[]Attendance {
 	sort.Slice(attendances, func(i, j int) bool {
 		return attendances[i].Id > attendances[j].Id
 	})
-	
+
 	return &attendances
+}
+
+func insertDB(attendance Attendance) int {
+	attendances := loadAttendanceDB()
+	attendance.Id = (*attendances)[0].Id + 1
+	*attendances = append(*attendances, attendance)
+
+	file, err := os.Create("./db/attendances.json")
+	if err != nil {
+		return -1
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	if err := encoder.Encode(attendances); err != nil {
+		return -1
+	}
+	return attendance.Id
 }
 
 func createDB() {
