@@ -21,8 +21,9 @@ type Template struct {
 }
 
 type User struct {
-	Id   int    `json:"id"`
+	SerialNumber string `json:"serialNumber"`
 	Name string `json:"name"`
+	TimeStanp time.Time `json:"timeStanp"`
 }
 
 type Attendance struct {
@@ -30,7 +31,7 @@ type Attendance struct {
 	Name      string    `json:"name"`
 	TimeStart time.Time `json:"timeStart"`
 	TimeGoal  time.Time `json:"timeGoal"`
-	Users     []User    `json:"user"`
+	SerialNumber     []string    `json:"serialNumber"`
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
@@ -53,19 +54,53 @@ func main() {
 
 	// Routes
 	e.GET("/", hello)
+	e.POST("/nfc/touch", nfcTouchPOST)
+	//e.POST("/user/editor", )
 	e.GET("/attendance/list", attendanceListGET)
 	e.GET("/attendance/select", attendanceSelectGET)
 	e.GET("/attendance/new", attendanceNewGET)
 	e.POST("/attendance/new", attendanceNewPOST)
 
 	// Start server
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":1234"))
 }
 
 // Handler
 func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello, World!")
 }
+
+func nfcTouchPOST(c echo.Context) error {
+	/*
+	// json形式ではなく、form形式で送信することにする
+	POST /nfc/touch HTTP/1.1
+	Host: localhost:1234
+	Content-Type: application/x-www-form-urlencoded
+	Content-Length: 14
+
+	serialNumber=3
+	*/
+
+	serialNumber := c.FormValue("serialNumber")
+	user := searchSerialNumber(serialNumber)
+	attendances := loadAttendanceDB()
+
+	if user.Name == "" {
+		// DBに登録されていない
+		// usersDBに登録
+	}
+
+	// 受付中の出席管理があれば出席にする
+	for _, attendance := range *attendances {
+		if  time.Now().After(attendance.TimeStart) && time.Now().Before(attendance.TimeGoal) {
+			// 受付中
+			insertRecodAttendancdDB(attendance.Id, serialNumber)
+		}
+	}
+	
+	return c.JSON(http.StatusOK, user)
+}
+
 
 func attendanceNewGET(c echo.Context) error {
 	attendances := loadAttendanceDB()
@@ -116,6 +151,39 @@ func attendanceListGET(c echo.Context) error {
 	return c.Render(http.StatusOK, "404.html", "This is First Page")
 }
 
+func searchSerialNumber(serialNumber string) User {
+	users := loadUsersDB()
+	for _, user := range *users {
+		if user.SerialNumber == serialNumber {
+			return user
+		}
+	}
+	return User{}
+}
+
+func loadUsersDB() *[]User {
+	file, err := os.Open("./db/users.json")
+	if err != nil {
+		return nil
+	}
+	defer file.Close()
+
+	var users []User
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&users); err != nil {
+		return nil
+	}
+
+	/*
+	sort.Slice(users, func(i, j int) bool {
+		return attendances[i].Id > attendances[j].Id
+	})
+	*/
+
+	return &users
+}
+
+
 func loadAttendanceDB() *[]Attendance {
 	file, err := os.Open("./db/attendances.json")
 	if err != nil {
@@ -155,28 +223,65 @@ func insertDB(attendance Attendance) int {
 	return attendance.Id
 }
 
+func insertRecodAttendancdDB(attendanceId int, serialNumber string)  {
+	attendances := loadAttendanceDB()
+	for _, attendance := range *attendances{
+		if attendance.Id == attendanceId {
+			attendance.SerialNumber = append(attendance.SerialNumber, serialNumber)
+		}
+	}
+
+	file, err := os.Create("./db/attendances.json")
+	if err != nil {
+		return
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	if err := encoder.Encode(attendances); err != nil {
+		return
+	}
+	return
+}
+
 func createDB() {
+	users := []User{
+		{
+			SerialNumber: "0",
+			Name: "kashi",
+		},
+		{
+			SerialNumber: "1",
+			Name: "sotaro",
+		},
+		{
+			SerialNumber: "2",
+			Name: "sok",
+		},
+	}
+
 	attendances := []Attendance{
 		{
 			Id:        0,
 			Name:      "点呼",
 			TimeStart: time.Date(2024, 04, 29, 23, 8, 2, 0, &time.Location{}),
 			TimeGoal:  time.Date(2024, 04, 29, 24, 8, 2, 0, &time.Location{}),
-			Users:     []User{{1, "sotaro"}, {2, "sok"}},
+			SerialNumber: 		[]string{"1", "0"},
 		},
 		{
 			Id:        1,
 			Name:      "コンピュータ部出席確認",
 			TimeStart: time.Date(2024, 04, 30, 23, 8, 2, 0, &time.Location{}),
 			TimeGoal:  time.Date(2024, 04, 30, 24, 8, 2, 0, &time.Location{}),
-			Users:     []User{{1, "sotaro"}, {2, "sok"}},
+			SerialNumber: 		[]string{"1", "2"},
 		},
 		{
 			Id:        2,
 			Name:      "点呼",
 			TimeStart: time.Date(2024, 05, 01, 0, 0, 0, 0, &time.Location{}),
 			TimeGoal:  time.Date(2024, 05, 01, 23, 8, 2, 0, &time.Location{}),
-			Users:     []User{{1, "sotaro"}, {2, "sok"}},
+			SerialNumber: 		[]string{"1", "2"},
 		},
 	}
 
@@ -191,5 +296,18 @@ func createDB() {
 	if err := encoder.Encode(attendances); err != nil {
 		return
 	}
+
+	file, err = os.Create("./db/users.json")
+	if err != nil {
+		return
+	}
+	defer file.Close()
+
+	encoder = json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	if err := encoder.Encode(users); err != nil {
+		return
+	}
+
 	return
 }
