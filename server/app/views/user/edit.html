@@ -7,20 +7,30 @@
     </head>
     <body>
         {{ template "header" }}
-        <h1>出席者</h1>
-        <form action="/user/edit" method="post">
-            <table>
-                <tr><th>ID</th><th>名前</th><th>最終アクセス時刻</th></tr>
-                {{ range . }}
-                    <tr>
-                        <td>{{ .SerialNumber }}</td>
-                        <td><input type="text" name="name-{{.SerialNumber}}" value="{{ .Name }}"></td>
-                        <td>{{ .TimeStanp }}</td>
-                    </tr>
-                {{ end }}
-            </table>
-            <input type="submit" value="送信">
-        </form>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-10">
+                    <h1>ユーザ一覧</h1>
+                    <form action="/user/edit" method="post">
+                        <table class="table table-hover table-bordered">
+                            <thead>
+                                <tr><th>ID</th><th>名前</th><th>最終アクセス時刻</th></tr>
+                            </thead>
+                            <tbody>
+                                {{ range . }}
+                                    <tr>
+                                        <td>{{ .SerialNumber }}</td>
+                                        <td><input type="text" class="form-control" name="name-{{.SerialNumber}}" value="{{ .Name }}"></td>
+                                        <td>{{ .TimeStanp }}</td>
+                                    </tr>
+                                {{ end }}
+                            </tbody>
+                        </table>
+                        <input type="submit" value="データを更新" class="btn btn-outline-primary">
+                    </form>
+                </div>
+            </div>
+        </div>
     </body>
 </html>
 {{end}}

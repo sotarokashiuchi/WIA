@@ -11,10 +11,20 @@
             <div class="row justify-content-center">
                 <div class="col-10">
                     <h1>{{.Attendance.Id}}:{{.Attendance.Name}}</h1>
-                    <h2>出席者</h2>
-                    {{ range .Users }}
-                        <p>{{.SerialNumber}}:{{.Name}}</p>
-                    {{ end }}
+                    <table class="table table-hover table-bordered">
+                        <thead>
+                            <tr><th>シリアルナンバー</th><th>名前</th><th>出席時刻</th></tr>
+                        </thead>
+                        <tbody>
+                            {{ range .Users }}
+                            <tr>
+                                <td>{{.SerialNumber}}</td>
+                                <td>{{.Name}}</td>
+                                <td>{{.TimeStanp}}</td>
+                            </tr>
+                            {{ end }}
+                        </tbody>
+                    </table>
                     <a href="/attendance/download?id={{.Attendance.Id}}">CSVファイルをダウンロード</a>
                 </div>
             </div>

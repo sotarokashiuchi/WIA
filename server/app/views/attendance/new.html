@@ -7,29 +7,49 @@
     </head>
     <body>
         {{ template "header" }}
-        <h1>出席パラメータ作成</h1>
-        <form action="/attendance/new" method="post">
-            <div>
-                <label>名前</label>
-                <input type="text" name="name" list="nameList">
-                <datalist id="nameList">
-                    {{ range . }}
-                        <option value="{{ . }}"></option>
-                    {{ end }}
-                </datalist>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-10">
+                    <h1>出席パラメータ作成</h1>
+                    <form action="/attendance/new" method="post">
+                        <div class="mb-2">
+                            <label class="form-label">名前</label>
+                            <input type="text" class="form-control" name="name" list="nameList">
+                            <datalist id="nameList">
+                                {{ range . }}
+                                <option value="{{ . }}"></option>
+                                {{ end }}
+                            </datalist>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">開始時刻</label>
+                            <div class="row">
+                                <div class="col-sm">
+                                    <input type="date" class="form-control" name="dateStart" id="dateStart">
+                                </div>
+                                <div class="col-sm">
+                                    <input type="time" class="form-control" name="timeStart" value="00:00">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">終了時刻</label>
+                            <div class="row">
+                                <div class="col-sm">
+                                    <input type="date" class="form-control" name="dateGoal" id="dateGoal">
+                                </div>
+                                <div class="col-sm">
+                                    <input type="time" class="form-control" name="timeGoal" value="23:59">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <input type="submit" value="送信" class="btn btn-outline-primary col-12">
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div>
-                <label>開始時刻</label>
-                <input type="date" name="dateStart" id="dateStart">
-                <input type="time" name="timeStart" value="00:00">
-            </div>
-            <div>
-                <label>終了時刻</label>
-                <input type="date" name="dateGoal" id="dateGoal">
-                <input type="time" name="timeGoal" value="23:59">
-            </div>
-            <input type="submit">
-        </form>
+        </div>
     </body>
 
     <script>

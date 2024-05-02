@@ -7,8 +7,14 @@
     </head>
     <body>
         {{ template "header" }}
-        <h1>Completed!!</h1>
-        <a href="/attendance/list?id={{ . }}">こちら</a>から出席状況を確認できます
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-10">
+                    <h1>Completed!!</h1>
+                    <a href="/attendance/list?id={{ . }}">こちら</a>から出席状況を確認できます
+                </div>
+            </div>
+        </div>
     </body>
 </html>
 {{end}}
