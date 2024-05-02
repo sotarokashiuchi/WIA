@@ -1,0 +1,25 @@
+{{define "userEdit"}}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Editor</title>
+        <meta charset="utf-8" />
+    </head>
+    <body>
+        <h1>出席者</h1>
+        <form action="/user/edit" method="post">
+            <table>
+                <tr><th>ID</th><th>名前</th><th>最終アクセス時刻</th></tr>
+                {{ range . }}
+                    <tr>
+                        <td>{{ .SerialNumber }}</td>
+                        <td><input type="text" name="name-{{.SerialNumber}}" value="{{ .Name }}"></td>
+                        <td>{{ .TimeStanp }}</td>
+                    </tr>
+                {{ end }}
+            </table>
+            <input type="submit" value="送信">
+        </form>
+    </body>
+</html>
+{{end}}

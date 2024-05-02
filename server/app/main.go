@@ -55,7 +55,7 @@ func main() {
 	// Routes
 	e.GET("/", hello)
 	e.POST("/nfc/touch", nfcTouchPOST)
-	//e.POST("/user/editor", )
+	e.GET("/user/edit", userEditGET)
 	e.GET("/attendance/list", attendanceListGET)
 	e.GET("/attendance/select", attendanceSelectGET)
 	e.GET("/attendance/new", attendanceNewGET)
@@ -68,6 +68,11 @@ func main() {
 // Handler
 func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello, World!")
+}
+
+func userEditGET(c echo.Context) error {
+	users := loadUsersDB()
+	return c.Render(http.StatusOK, "userEdit", *users)
 }
 
 func nfcTouchPOST(c echo.Context) error {
@@ -192,11 +197,9 @@ func loadUsersDB() *[]User {
 		return nil
 	}
 
-	/*
-		sort.Slice(users, func(i, j int) bool {
-			return attendances[i].Id > attendances[j].Id
-		})
-	*/
+	sort.Slice(users, func(i, j int) bool {
+		return users[i].TimeStanp.After(users[j].TimeStanp)
+	})
 
 	return &users
 }
