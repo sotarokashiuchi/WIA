@@ -41,7 +41,6 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 func main() {
 	fmt.Print("\n\n")
 	createTestDB()
-	insertRecodAttendancdDB(2, "serialNumber0")
 	t := &Template{
 		templates: template.Must(template.ParseGlob("views/*/*.html")),
 	}
@@ -87,15 +86,34 @@ func nfcTouchPOST(c echo.Context) error {
 	attendances := loadAttendanceDB()
 
 	if user.Name == "" {
-		// DBに登録されていない
 		// usersDBに登録
+		users := loadUsersDB()
+		if user.SerialNumber == "" {
+			*users = append(*users, User{
+				SerialNumber: serialNumber,
+				TimeStanp:    time.Now(),
+			})
+		} else {
+			for i, user := range *users {
+				if user.SerialNumber == serialNumber {
+					(*users)[i].TimeStanp = time.Now()
+				}
+			}
+		}
+		createDB("./db/users.json", *users)
 	}
 
 	// 受付中の出席管理があれば出席にする
-	for _, attendance := range *attendances {
+	for i, attendance := range *attendances {
 		if time.Now().After(attendance.TimeStart) && time.Now().Before(attendance.TimeGoal) {
 			// 受付中
-			insertRecodAttendancdDB(attendance.Id, serialNumber)
+			for _, serialNum := range attendance.SerialNumber {
+				if serialNum == serialNumber {
+					return c.JSON(http.StatusOK, user)
+				}
+			}
+			(*attendances)[i].SerialNumber = append(attendance.SerialNumber, serialNumber)
+			createDB("./db/attendances.json", *attendances)
 		}
 	}
 
@@ -210,17 +228,6 @@ func insertDB(attendance Attendance) int {
 
 	createDB("./db/attendances.json", *attendances)
 	return attendance.Id
-}
-
-func insertRecodAttendancdDB(attendanceId int, serialNumber string) {
-	attendances := loadAttendanceDB()
-	for i, attendance := range *attendances {
-		if attendance.Id == attendanceId {
-			(*attendances)[i].SerialNumber = append(attendance.SerialNumber, serialNumber)
-		}
-	}
-
-	createDB("./db/attendances.json", *attendances)
 }
 
 func createTestDB() {
