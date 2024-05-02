@@ -2,10 +2,11 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Title</title>
-        <meta charset="utf-8" />
+        <title>Bootstrap demo</title>
+        {{ template "head" }}
     </head>
     <body>
+        {{ template "header" }}
         <h1>出席パラメータ作成</h1>
         <form action="/attendance/new" method="post">
             <div>

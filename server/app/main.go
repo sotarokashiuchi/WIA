@@ -54,7 +54,8 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// Routes
-	e.GET("/", hello)
+	e.Static("/static", "static")
+	e.GET("/", index)
 	e.POST("/nfc/touch", nfcTouchPOST)
 	e.GET("/user/edit", userEditGET)
 	e.POST("/user/edit", userEditPOST)
@@ -69,8 +70,8 @@ func main() {
 }
 
 // Handler
-func hello(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, World!")
+func index(c echo.Context) error {
+	return c.Render(http.StatusOK, "index", "")
 }
 
 func attendanceDownloadGET(c echo.Context) error {

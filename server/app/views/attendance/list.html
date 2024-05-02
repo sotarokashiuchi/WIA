@@ -2,15 +2,23 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Title</title>
-        <meta charset="utf-8" />
+        <title>Bootstrap demo</title>
+        {{ template "head" }}
     </head>
     <body>
-        <h1>{{.Id}}:{{.Name}}</h1>
-        <h2>出席者</h2>
-        {{ range .Users }}
-            <p>{{.Id}}:{{.Name}}</p>
-        {{ end }}
+        {{ template "header" }}
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-10">
+                    <h1>{{.Attendance.Id}}:{{.Attendance.Name}}</h1>
+                    <h2>出席者</h2>
+                    {{ range .Users }}
+                        <p>{{.SerialNumber}}:{{.Name}}</p>
+                    {{ end }}
+                    <a href="/attendance/download?id={{.Attendance.Id}}">CSVファイルをダウンロード</a>
+                </div>
+            </div>
+        </div>
     </body>
 </html>
 {{end}}
