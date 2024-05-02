@@ -198,6 +198,11 @@ func attendanceSelectGET(c echo.Context) error {
 }
 
 func attendanceListGET(c echo.Context) error {
+	type htmlAttendance struct {
+		Attendance Attendance
+		Users      []User
+	}
+
 	id, err := strconv.Atoi(c.QueryParam(("id")))
 	if err != nil {
 		return c.Render(http.StatusOK, "404.html", "Cant't to Found Page")
@@ -206,7 +211,14 @@ func attendanceListGET(c echo.Context) error {
 	attendances := loadAttendanceDB()
 	for _, attendance := range *attendances {
 		if attendance.Id == id {
-			return c.Render(http.StatusOK, "attendanceList", attendance)
+			var users []User
+
+			for _, serialNumber := range attendance.SerialNumber {
+				user := searchSerialNumber(serialNumber)
+				users = append(users, user)
+			}
+
+			return c.Render(http.StatusOK, "attendanceList", htmlAttendance{Attendance: attendance, Users: users})
 		}
 	}
 	return c.Render(http.StatusOK, "404.html", "This is First Page")
