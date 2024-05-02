@@ -56,6 +56,7 @@ func main() {
 	e.GET("/", hello)
 	e.POST("/nfc/touch", nfcTouchPOST)
 	e.GET("/user/edit", userEditGET)
+	e.POST("/user/edit", userEditPOST)
 	e.GET("/attendance/list", attendanceListGET)
 	e.GET("/attendance/select", attendanceSelectGET)
 	e.GET("/attendance/new", attendanceNewGET)
@@ -68,6 +69,15 @@ func main() {
 // Handler
 func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello, World!")
+}
+
+func userEditPOST(c echo.Context) error {
+	users := loadUsersDB()
+	for i, user := range *users {
+		(*users)[i].Name = c.FormValue("name-" + user.SerialNumber)
+	}
+	createDB("./db/users.json", *users)
+	return c.Render(http.StatusOK, "userEdit", *users)
 }
 
 func userEditGET(c echo.Context) error {
@@ -239,14 +249,17 @@ func createTestDB() {
 		{
 			SerialNumber: "0",
 			Name:         "kashi",
+			TimeStanp:    time.Now(),
 		},
 		{
 			SerialNumber: "1",
 			Name:         "sotaro",
+			TimeStanp:    time.Now(),
 		},
 		{
 			SerialNumber: "2",
-			Name:         "sok",
+			Name:         "souchan",
+			TimeStanp:    time.Now(),
 		},
 	}
 	createDB("./db/users.json", users)
