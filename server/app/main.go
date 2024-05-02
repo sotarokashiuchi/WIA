@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -58,6 +59,7 @@ func main() {
 	e.GET("/user/edit", userEditGET)
 	e.POST("/user/edit", userEditPOST)
 	e.GET("/attendance/list", attendanceListGET)
+	e.GET("/attendance/download", attendanceDownloadGET)
 	e.GET("/attendance/select", attendanceSelectGET)
 	e.GET("/attendance/new", attendanceNewGET)
 	e.POST("/attendance/new", attendanceNewPOST)
@@ -69,6 +71,32 @@ func main() {
 // Handler
 func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello, World!")
+}
+
+func attendanceDownloadGET(c echo.Context) error {
+	id, err := strconv.Atoi(c.QueryParam(("id")))
+	if err != nil {
+		return c.Render(http.StatusOK, "404.html", "Cant't to Found Page")
+	}
+
+	attendances := loadAttendanceDB()
+	var fileName string
+	for _, attendance := range *attendances {
+		if attendance.Id == id {
+			var csv [][]string
+			csv = append(csv, []string{"ID:" + strconv.Itoa(attendance.Id), "Name:" + attendance.Name})
+			csv = append(csv, []string{"出席者", "出席時刻"})
+
+			for _, serialNumber := range attendance.SerialNumber {
+				user := searchSerialNumber(serialNumber)
+				csv = append(csv, []string{user.Name, user.TimeStanp.String()})
+			}
+
+			fileName = strconv.Itoa(id) + ".csv"
+			createCSV("./tmp/"+fileName, csv)
+		}
+	}
+	return c.Attachment("./tmp/"+fileName, fileName)
 }
 
 func userEditPOST(c echo.Context) error {
@@ -289,6 +317,23 @@ func createTestDB() {
 		},
 	}
 	createDB("./db/attendances.json", attendances)
+	return
+}
+
+func createCSV(fileName string, data [][]string) {
+	fmt.Print("\n\n", data)
+	file, err := os.Create(fileName)
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+	for _, line := range data {
+		writer.Write(line)
+	}
 	return
 }
 
