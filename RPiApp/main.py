@@ -3,6 +3,8 @@ import requests
 import time
 import i2clcda as lcd
 
+HIGH = 1
+LOW = 0
 LED_GREEN = 22
 LED_RED = 27
 LED_BLUE = 23
@@ -32,32 +34,52 @@ def requestNFCToch(serialNumber):
 
 
 def main():
-    # print(requestNFCToch("1"))
+    # test program
+    lcd.lcd_string("Created by         <",lcd.LCD_LINE_1)
+    lcd.lcd_string("Osoyoo.com        <",lcd.LCD_LINE_2)
+    time.sleep(3)
+
+    lcd.lcd_string("> Tutorial Url:",lcd.LCD_LINE_1)
+    lcd.lcd_string("> http://osoyoo.com",lcd.LCD_LINE_2)
+    time.sleep(3)
+
+    lcd.lcd_string("> ワタシノナマエハ",lcd.LCD_LINE_1)
+    lcd.lcd_string("> バビブペピョ",lcd.LCD_LINE_2)
+    time.sleep(3)
+    return
+
+    serialNumber = ""
+    name = ""
     while True:
-        # Send some test
-        lcd.lcd_string("Created by         <",lcd.LCD_LINE_1)
-        lcd.lcd_string("Osoyoo.com        <",lcd.LCD_LINE_2)
-
-        time.sleep(3)
-
-        # Send some more text
-        lcd.lcd_string("> Tutorial Url:",lcd.LCD_LINE_1)
-        lcd.lcd_string("> http://osoyoo.com",lcd.LCD_LINE_2)
-
-        time.sleep(3)
-
-    for i in range(3):
-        print("hi")
-        GPIO.output(LED_GREEN, 1)
-        GPIO.output(LED_RED, 1)
-        GPIO.output(LED_BLUE, 1)
-        GPIO.output(BUZZER, 1)
-        time.sleep(0.5)
-        GPIO.output(LED_GREEN,0)
-        GPIO.output(LED_RED,0)
-        GPIO.output(LED_BLUE,0)
-        GPIO.output(BUZZER, 0)
-        time.sleep(0.5)
+        # NFC読み取り処理
+        if serialNumber == "1":
+            if serialNumber != "学生証のデータ形式ではない":
+                # 学生証ではない
+                lcd.lcd_string("Error", lcd.LCD_LINE_1)
+                lcd.lcd_string("Failed to Read", lcd.LCD_LINE_2)
+                GPIO.output(BUZZER, HIGH)
+                GPIO.output(LED_RED, LOW)
+            else:
+                name = requestNFCToch(serialNumber)
+                if name == "":
+                    # 名前の未登録
+                    lcd.lcd_string("Warning", lcd.LCD_LINE_1)
+                    lcd.lcd_string("Not Registered", lcd.LCD_LINE_2)
+                    GPIO.output(BUZZER, HIGH)
+                    GPIO.output(LED_BLUE, HIGH)
+                else:
+                    # 正常処理
+                    lcd.lcd_string("Completed!", lcd.LCD_LINE_1)
+                    lcd.lcd_string(name, lcd.LCD_LINE_2)
+                    GPIO.output(BUZZER, HIGH)
+                    GPIO.output(LED_GREEN, HIGH)
+            
+            time.sleep(0.5)
+            GPIO.output(LED_GREEN, LOW)
+            GPIO.output(LED_BLUE, LOW)
+            GPIO.output(LED_RED, LOW)
+            GPIO.output(BUZZER, LOW)
+            lcd.lcd_init()
     return
 
 if __name__ == '__main__':
