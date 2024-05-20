@@ -1,6 +1,7 @@
 import RPi.GPIO as GPIO
 import requests
 import time
+import i2clcda as lcd
 
 LED_GREEN = 22
 LED_RED = 27
@@ -25,6 +26,20 @@ GPIO.setup(LED_RED, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(LED_GREEN, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(LED_BLUE, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(BUZZER, GPIO.OUT, initial=GPIO.LOW)
+
+lcd.lcd_init()
+while True:
+    # Send some test
+    lcd.lcd_string("Created by         <",lcd.LCD_LINE_1)
+    lcd.lcd_string("Osoyoo.com        <",lcd.LCD_LINE_2)
+
+    time.sleep(3)
+
+    # Send some more text
+    lcd.lcd_string("> Tutorial Url:",lcd.LCD_LINE_1)
+    lcd.lcd_string("> http://osoyoo.com",lcd.LCD_LINE_2)
+
+    time.sleep(3)
 
 for i in range(3):
     print("hi")
