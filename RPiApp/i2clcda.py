@@ -8,6 +8,9 @@
 import smbus
 import time
 
+# | I2C_ADDR | RS (LCD_CHR or LCD_CMD) | D7 D6 D5 D4 E EN R/W RS
+#                                      | D3 D2 D1 D0 E EN R/W RS
+
 # Define some device parameters
 I2C_ADDR  = 0x27 # I2C device address, if any error, change this address to 0x3f
 LCD_WIDTH = 16   # Maximum characters per line
@@ -50,7 +53,9 @@ def lcd_byte(bits, mode):
   # mode = 1 for data
   #        0 for command
 
+  # D7 D6 D5 D4 LCD_BACKLIGHT _ _ mode
   bits_high = mode | (bits & 0xF0) | LCD_BACKLIGHT
+  # D3 D2 D1 D0 LCD_BACKLIGHT _ _ mode
   bits_low = mode | ((bits<<4) & 0xF0) | LCD_BACKLIGHT
 
   # High bits
@@ -64,8 +69,10 @@ def lcd_byte(bits, mode):
 def lcd_toggle_enable(bits):
   # Toggle enable
   time.sleep(E_DELAY)
+  # D7 D6 D5 D4 LCD_BACKLIGHT 1 _ mode
   bus.write_byte(I2C_ADDR, (bits | ENABLE))
   time.sleep(E_PULSE)
+  # D7 D6 D5 D4 LCD_BACKLIGHT 0 _ mode
   bus.write_byte(I2C_ADDR,(bits & ~ENABLE))
   time.sleep(E_DELAY)
 
