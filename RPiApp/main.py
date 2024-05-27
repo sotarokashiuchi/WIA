@@ -35,17 +35,18 @@ def requestNFCToch(serialNumber):
 
 def main():
     # test program
-    lcd.lcd_string("Created by         <",lcd.LCD_LINE_1)
-    lcd.lcd_string("Osoyoo.com        <",lcd.LCD_LINE_2)
-    time.sleep(3)
+    while(1):
+        lcd.lcd_string("Created by ",lcd.LCD_LINE_1)
+        lcd.lcd_string("Osoyoo.com ",lcd.LCD_LINE_2)
+        time.sleep(3)
 
-    lcd.lcd_string("> Tutorial Url:",lcd.LCD_LINE_1)
-    lcd.lcd_string("> http://osoyoo.com",lcd.LCD_LINE_2)
-    time.sleep(3)
+        lcd.lcd_string("> Tutorial Url:",lcd.LCD_LINE_1)
+        lcd.lcd_string("> http://osoyoo.com",lcd.LCD_LINE_2)
+        time.sleep(3)
 
-    lcd.lcd_string("> ワタシノナマエハ",lcd.LCD_LINE_1)
-    lcd.lcd_string("> バビブペピョ",lcd.LCD_LINE_2)
-    time.sleep(3)
+        lcd.lcd_string("> ワタシノナマエハ",lcd.LCD_LINE_1)
+        lcd.lcd_string("> バビブペピョ",lcd.LCD_LINE_2)
+        time.sleep(3)
     return
 
     serialNumber = ""
@@ -82,6 +83,7 @@ def main():
             lcd.lcd_init()
     return
 
+print("hi")
 if __name__ == '__main__':
     try:
         main()
