@@ -37,6 +37,16 @@ def requestNFCToch(serialNumber):
 
     return response.json()["name"]
 
+def readTagUID():
+    while(True):
+        rdr.wait_for_tag()
+        (error, tag_type) = rdr.request()
+        if not error:
+            print("Tag detected")
+            (error, uid) = rdr.anticoll()
+            if not error:
+                print("UID: " + str(uid))
+                return str(uid)
 
 def main():
     # test program
@@ -76,7 +86,9 @@ def main():
     name = ""
     while True:
         # NFC読み取り処理
-        if serialNumber == "1":
+        serialNumber = readTagUID()
+
+        if serialNumber != "":
             if serialNumber != "学生証のデータ形式ではない":
                 # 学生証ではない
                 lcd.lcd_string("Error", lcd.LCD_LINE_1)
