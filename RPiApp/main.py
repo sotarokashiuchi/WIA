@@ -3,6 +3,7 @@ import requests
 import time
 import i2clcda as lcd
 from pirc522 import RFID
+import tone
 
 HIGH = 1
 LOW = 0
@@ -12,6 +13,7 @@ LED_BLUE = 23
 BUZZER = 12
 
 rdr = RFID(pin_rst=25, pin_irq=24, pin_mode=GPIO.BCM)
+buzzerPWM = tone.Tone(BUZZER)
 
 def initialize():
     GPIO.setmode(GPIO.BCM)
@@ -26,6 +28,7 @@ def finalize():
     GPIO.cleanup()
     rdr.cleanup()
     lcd.lcd_byte(0x01, lcd.LCD_CMD)
+    buzzerPWM.destroy()
     return
 
 def requestNFCToch(serialNumber):
@@ -49,7 +52,7 @@ def readTagUID():
                 return str(uid)
 
 def main():
-    # test program
+    # test program:NFC
     while True:
         rdr.wait_for_tag()
         (error, tag_type) = rdr.request()
@@ -67,6 +70,8 @@ def main():
                         # Always stop crypto1 when done working
                         rdr.stop_crypto()
 
+    # test program:Buzzer
+    buzzerPWM.beepUntilTime(440, 3)
 
     while(1):
         lcd.lcd_string("Created by ",lcd.LCD_LINE_1)
@@ -91,6 +96,7 @@ def main():
         if serialNumber != "":
             if serialNumber != "学生証のデータ形式ではない":
                 # 学生証ではない
+                buzzerPWM.beep(440)
                 lcd.lcd_string("Error", lcd.LCD_LINE_1)
                 lcd.lcd_string("Failed to Read", lcd.LCD_LINE_2)
                 GPIO.output(BUZZER, HIGH)
@@ -99,12 +105,14 @@ def main():
                 name = requestNFCToch(serialNumber)
                 if name == "":
                     # 名前の未登録
+                    buzzerPWM.beep(440)
                     lcd.lcd_string("Warning", lcd.LCD_LINE_1)
                     lcd.lcd_string("Not Registered", lcd.LCD_LINE_2)
                     GPIO.output(BUZZER, HIGH)
                     GPIO.output(LED_BLUE, HIGH)
                 else:
                     # 正常処理
+                    buzzerPWM.beep(440)
                     lcd.lcd_string("Completed!", lcd.LCD_LINE_1)
                     lcd.lcd_string(name, lcd.LCD_LINE_2)
                     GPIO.output(BUZZER, HIGH)
