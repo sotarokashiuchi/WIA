@@ -23,8 +23,8 @@
                                             {{ .Id }}:{{ .Name }}
                                         </a>
                                     </td>
-                                    <td>{{ .TimeStart }}</td>
-                                    <td>{{ .TimeGoal }}</td>
+                                    <td>{{.TimeStart.Year}}/{{.TimeStart.Month}}/{{.TimeStart.Day}} {{.TimeStart.Hour}}:{{.TimeStart.Minut}}:{{.TimeStart.Second}}</td>
+                                    <td>{{.TimeGoal.Year}}/{{.TimeGoal.Month}}/{{.TimeGoal.Day}} {{.TimeGoal.Hour}}:{{.TimeGoal.Minut}}:{{.TimeGoal.Second}}</td>
                                 </tr>
                             {{ end }}
                         </tbody>

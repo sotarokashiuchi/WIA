@@ -21,18 +21,64 @@ type Template struct {
 	templates *template.Template
 }
 
+type SimpleTime struct {
+	Year   int `json:"year"`
+	Month  int `json:"month"`
+	Day    int `json:"day"`
+	Hour   int `json:"hour"`
+	Minut  int `json:"minut"`
+	Second int `json:"second"`
+}
+
 type User struct {
-	SerialNumber string    `json:"serialNumber"`
-	Name         string    `json:"name"`
-	TimeStanp    time.Time `json:"timeStanp"`
+	SerialNumber string     `json:"serialNumber"`
+	Name         string     `json:"name"`
+	TimeStanp    SimpleTime `json:"timeStanp"`
 }
 
 type Attendance struct {
-	Id           int       `json:"id"`
-	Name         string    `json:"name"`
-	TimeStart    time.Time `json:"timeStart"`
-	TimeGoal     time.Time `json:"timeGoal"`
-	SerialNumber []string  `json:"serialNumber"`
+	Id           int        `json:"id"`
+	Name         string     `json:"name"`
+	TimeStart    SimpleTime `json:"timeStart"`
+	TimeGoal     SimpleTime `json:"timeGoal"`
+	SerialNumber []string   `json:"serialNumber"`
+}
+
+var jst *time.Location
+
+func transToSimpleTimeFromTime(time time.Time) SimpleTime {
+	return transToSimpleTimeFromInt(
+		time.Year(),
+		int(time.Month()),
+		time.Day(),
+		time.Hour(),
+		time.Minute(),
+		time.Second(),
+	)
+}
+
+func transToTimeFromSimpleTime(simpleTime SimpleTime) time.Time {
+	return time.Date(
+		simpleTime.Year,
+		time.Month(simpleTime.Month),
+		simpleTime.Day,
+		simpleTime.Hour,
+		simpleTime.Minut,
+		simpleTime.Second,
+		0,
+		jst,
+	)
+}
+
+func transToSimpleTimeFromInt(year, month, day, hour, minut, second int) SimpleTime {
+	return SimpleTime{
+		Year:   year,
+		Month:  month,
+		Day:    day,
+		Hour:   hour,
+		Minut:  minut,
+		Second: second,
+	}
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
@@ -40,6 +86,7 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 }
 
 func main() {
+	jst, _ = time.LoadLocation("Asia/Tokyo")
 	fmt.Print("\n\n")
 	createTestDB()
 	t := &Template{
@@ -90,7 +137,7 @@ func attendanceDownloadGET(c echo.Context) error {
 
 			for _, serialNumber := range attendance.SerialNumber {
 				user := searchSerialNumber(serialNumber)
-				csv = append(csv, []string{user.Name, user.TimeStanp.String()})
+				csv = append(csv, []string{user.Name, transToTimeFromSimpleTime(user.TimeStanp).String()})
 			}
 
 			fileName = strconv.Itoa(id) + ".csv"
@@ -135,12 +182,12 @@ func nfcTouchPOST(c echo.Context) error {
 		if user.SerialNumber == "" {
 			*users = append(*users, User{
 				SerialNumber: serialNumber,
-				TimeStanp:    time.Now(),
+				TimeStanp:    transToSimpleTimeFromTime(time.Now().In(jst)),
 			})
 		} else {
 			for i, user := range *users {
 				if user.SerialNumber == serialNumber {
-					(*users)[i].TimeStanp = time.Now()
+					(*users)[i].TimeStanp = transToSimpleTimeFromTime(time.Now().In(jst))
 				}
 			}
 		}
@@ -149,7 +196,8 @@ func nfcTouchPOST(c echo.Context) error {
 
 	// 受付中の出席管理があれば出席にする
 	for i, attendance := range *attendances {
-		if time.Now().After(attendance.TimeStart) && time.Now().Before(attendance.TimeGoal) {
+		fmt.Println(transToTimeFromSimpleTime(attendance.TimeStart))
+		if time.Now().In(jst).After(transToTimeFromSimpleTime(attendance.TimeStart)) && time.Now().In(jst).Before(transToTimeFromSimpleTime(attendance.TimeGoal)) {
 			// 受付中
 			for _, serialNum := range attendance.SerialNumber {
 				if serialNum == serialNumber {
@@ -186,8 +234,8 @@ func attendanceNewPOST(c echo.Context) error {
 	id := insertDB(
 		Attendance{
 			Name:      c.FormValue("name"),
-			TimeStart: dateStart,
-			TimeGoal:  dateGoal,
+			TimeStart: transToSimpleTimeFromTime(dateStart),
+			TimeGoal:  transToSimpleTimeFromTime(dateGoal),
 		},
 	)
 	return c.Render(http.StatusOK, "attendanceCompleted", id)
@@ -249,7 +297,7 @@ func loadUsersDB() *[]User {
 	}
 
 	sort.Slice(users, func(i, j int) bool {
-		return users[i].TimeStanp.After(users[j].TimeStanp)
+		return transToTimeFromSimpleTime(users[i].TimeStanp).After(transToTimeFromSimpleTime(users[j].TimeStanp))
 	})
 
 	return &users
@@ -290,17 +338,17 @@ func createTestDB() {
 		{
 			SerialNumber: "0",
 			Name:         "kashi",
-			TimeStanp:    time.Now(),
+			TimeStanp:    transToSimpleTimeFromTime(time.Now().In(jst)),
 		},
 		{
 			SerialNumber: "1",
 			Name:         "sotaro",
-			TimeStanp:    time.Now(),
+			TimeStanp:    transToSimpleTimeFromTime(time.Now().In(jst)),
 		},
 		{
 			SerialNumber: "2",
 			Name:         "souchan",
-			TimeStanp:    time.Now(),
+			TimeStanp:    transToSimpleTimeFromTime(time.Now().In(jst)),
 		},
 	}
 	createDB("./db/users.json", users)
@@ -310,22 +358,22 @@ func createTestDB() {
 		{
 			Id:           0,
 			Name:         "点呼",
-			TimeStart:    time.Date(2024, 04, 29, 23, 8, 2, 0, &time.Location{}),
-			TimeGoal:     time.Date(2024, 04, 29, 24, 8, 2, 0, &time.Location{}),
+			TimeStart:    transToSimpleTimeFromTime(time.Date(2024, 04, 29, 23, 8, 2, 0, jst)),
+			TimeGoal:     transToSimpleTimeFromTime(time.Date(2024, 04, 29, 24, 8, 2, 0, jst)),
 			SerialNumber: []string{"1", "0"},
 		},
 		{
 			Id:           1,
 			Name:         "コンピュータ部出席確認",
-			TimeStart:    time.Date(2024, 04, 30, 23, 8, 2, 0, &time.Location{}),
-			TimeGoal:     time.Date(2024, 04, 30, 24, 8, 2, 0, &time.Location{}),
+			TimeStart:    transToSimpleTimeFromTime(time.Date(2024, 04, 30, 23, 8, 2, 0, jst)),
+			TimeGoal:     transToSimpleTimeFromTime(time.Date(2024, 04, 30, 24, 8, 2, 0, jst)),
 			SerialNumber: []string{"1", "2"},
 		},
 		{
 			Id:           2,
 			Name:         "点呼",
-			TimeStart:    time.Date(2024, 05, 01, 0, 0, 0, 0, &time.Location{}),
-			TimeGoal:     time.Date(2024, 05, 05, 23, 8, 2, 0, &time.Location{}),
+			TimeStart:    transToSimpleTimeFromTime(time.Date(2024, 05, 01, 0, 0, 0, 0, jst)),
+			TimeGoal:     transToSimpleTimeFromTime(time.Date(2024, 05, 05, 23, 8, 2, 0, jst)),
 			SerialNumber: []string{"1", "2"},
 		},
 	}

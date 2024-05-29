@@ -20,7 +20,7 @@
                             <tr>
                                 <td>{{.SerialNumber}}</td>
                                 <td>{{.Name}}</td>
-                                <td>{{.TimeStanp}}</td>
+                                <td>{{.TimeStanp.Year}}/{{.TimeStanp.Month}}/{{.TimeStanp.Day}} {{.TimeStanp.Hour}}:{{.TimeStanp.Minut}}:{{.TimeStanp.Second}}</td>
                             </tr>
                             {{ end }}
                         </tbody>
