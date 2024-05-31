@@ -39,6 +39,7 @@ type User struct {
 type Attendance struct {
 	Id           int        `json:"id"`
 	Name         string     `json:"name"`
+	Status       string     `json:"status"` // nil , running or stopping
 	TimeStart    SimpleTime `json:"timeStart"`
 	TimeGoal     SimpleTime `json:"timeGoal"`
 	SerialNumber []string   `json:"serialNumber"`
@@ -231,9 +232,19 @@ func attendanceNewPOST(c echo.Context) error {
 	// ToDo: 出席管理実施時刻が被っていないか検証
 	dateStart, _ := time.Parse("2006-01-02T15:04:05Z07:00", c.FormValue("dateStart")+"T"+c.FormValue("timeStart")+":00+"+"00:00")
 	dateGoal, _ := time.Parse("2006-01-02T15:04:05Z07:00", c.FormValue("dateGoal")+"T"+c.FormValue("timeGoal")+":00+"+"00:00")
+	if c.FormValue("submit") == "running" {
+		id := insertDB(
+			Attendance{
+				Name:   c.FormValue("name"),
+				Status: c.FormValue("submit"),
+			},
+		)
+		return c.Render(http.StatusOK, "attendanceCompleted", id)
+	}
 	id := insertDB(
 		Attendance{
 			Name:      c.FormValue("name"),
+			Status:    c.FormValue("submit"),
 			TimeStart: transToSimpleTimeFromTime(dateStart),
 			TimeGoal:  transToSimpleTimeFromTime(dateGoal),
 		},
@@ -358,6 +369,7 @@ func createTestDB() {
 		{
 			Id:           0,
 			Name:         "点呼",
+			Status:       "nil",
 			TimeStart:    transToSimpleTimeFromTime(time.Date(2024, 04, 29, 23, 8, 2, 0, jst)),
 			TimeGoal:     transToSimpleTimeFromTime(time.Date(2024, 04, 29, 24, 8, 2, 0, jst)),
 			SerialNumber: []string{"1", "0"},
@@ -365,6 +377,7 @@ func createTestDB() {
 		{
 			Id:           1,
 			Name:         "コンピュータ部出席確認",
+			Status:       "nil",
 			TimeStart:    transToSimpleTimeFromTime(time.Date(2024, 04, 30, 23, 8, 2, 0, jst)),
 			TimeGoal:     transToSimpleTimeFromTime(time.Date(2024, 04, 30, 24, 8, 2, 0, jst)),
 			SerialNumber: []string{"1", "2"},
@@ -372,6 +385,7 @@ func createTestDB() {
 		{
 			Id:           2,
 			Name:         "点呼",
+			Status:       "nil",
 			TimeStart:    transToSimpleTimeFromTime(time.Date(2024, 05, 01, 0, 0, 0, 0, jst)),
 			TimeGoal:     transToSimpleTimeFromTime(time.Date(2024, 05, 05, 23, 8, 2, 0, jst)),
 			SerialNumber: []string{"1", "2"},
