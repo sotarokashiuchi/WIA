@@ -230,10 +230,18 @@ func attendanceNewGET(c echo.Context) error {
 }
 
 func attendanceNewPOST(c echo.Context) error {
-	// ToDo: 出席管理実施時刻が被っていないか検証
+	attendances := loadAttendanceDB()
 	dateStart, _ := time.Parse("2006-01-02T15:04:05Z07:00", c.FormValue("dateStart")+"T"+c.FormValue("timeStart")+":00+"+"00:00")
 	dateGoal, _ := time.Parse("2006-01-02T15:04:05Z07:00", c.FormValue("dateGoal")+"T"+c.FormValue("timeGoal")+":00+"+"00:00")
 	if c.FormValue("submit") == "running" {
+		// runningの出席簿があればstoppingする
+		for i, attendance := range *attendances {
+			if attendance.Status == "running" {
+				(*attendances)[i].Status = "stopping"
+			}
+		}
+		createDB("./db/attendances.json", *attendances)
+
 		id := insertDB(
 			Attendance{
 				Name:   c.FormValue("name"),
@@ -351,6 +359,17 @@ func loadAttendanceDB() *[]Attendance {
 		return attendances[i].Id > attendances[j].Id
 	})
 
+	for i, attendance := range attendances {
+		if !(time.Now().In(jst).After(transToTimeFromSimpleTime(attendance.TimeStart)) && time.Now().In(jst).Before(transToTimeFromSimpleTime(attendance.TimeGoal))) {
+			if attendance.Status == "running" && attendance.TimeStart.Year != 0 {
+				fmt.Println("stopping")
+				fmt.Println(transToTimeFromSimpleTime(attendance.TimeStart).Year())
+				attendances[i].Status = "stopping"
+			}
+		}
+	}
+	createDB("./db/attendances.json", attendances)
+
 	return &attendances
 }
 
@@ -405,7 +424,7 @@ func createTestDB() {
 		{
 			Id:           2,
 			Name:         "点呼",
-			Status:       "nil",
+			Status:       "running",
 			TimeStart:    transToSimpleTimeFromTime(time.Date(2024, 05, 01, 0, 0, 0, 0, jst)),
 			TimeGoal:     transToSimpleTimeFromTime(time.Date(2024, 05, 05, 23, 8, 2, 0, jst)),
 			SerialNumber: []string{"1", "2"},
