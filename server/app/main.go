@@ -110,6 +110,7 @@ func main() {
 	e.GET("/attendance/list", attendanceListGET)
 	e.GET("/attendance/download", attendanceDownloadGET)
 	e.GET("/attendance/select", attendanceSelectGET)
+	e.GET("/attendance/status", attendanceStatusGET)
 	e.GET("/attendance/new", attendanceNewGET)
 	e.POST("/attendance/new", attendanceNewPOST)
 
@@ -255,6 +256,25 @@ func attendanceNewPOST(c echo.Context) error {
 func attendanceSelectGET(c echo.Context) error {
 	attendances := loadAttendanceDB()
 	return c.Render(http.StatusOK, "attendanceSelect", *attendances)
+}
+
+func attendanceStatusGET(c echo.Context) error {
+	id, _ := strconv.Atoi(c.QueryParam(("id")))
+	attendances := loadAttendanceDB()
+
+	for i, attendance := range *attendances {
+		if attendance.Id == id {
+			(*attendances)[i].Status = c.QueryParam(("status"))
+		} else {
+			if attendance.Status == "running" {
+				(*attendances)[i].Status = "stopping"
+			}
+		}
+	}
+
+	createDB("./db/attendances.json", *attendances)
+
+	return c.String(http.StatusOK, "OK")
 }
 
 func attendanceListGET(c echo.Context) error {

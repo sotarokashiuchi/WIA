@@ -13,18 +13,34 @@
                     <h1>出席簿選択</h1>
                     <table class="table table-hover table-bordered">
                         <thead>
-                            <tr><th>ID:名前</th><th>開始時刻</th><th>終了時刻</th></tr>
+                            <tr><th>状態</th><th>ID:名前</th><th>開始時刻</th><th>終了時刻</th></tr>
                         </thead>
                         <tbody>
                             {{ range . }}
                                 <tr>
                                     <td>
+                                        {{ if eq .Status "running" }}
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input inputclass" type="checkbox" name="{{ .Id }}" checked>
+                                            </div>
+                                        {{ else }}
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input inputclass" type="checkbox" name="{{ .Id }}">
+                                            </div>
+                                        {{ end }}
+                                    </td>
+                                    <td>
                                         <a href="/attendance/list?id={{ .Id }}" style="display: block; width: 100%; height: 100%;">
                                             {{ .Id }}:{{ .Name }}
                                         </a>
                                     </td>
-                                    <td>{{.TimeStart.Year}}/{{.TimeStart.Month}}/{{.TimeStart.Day}} {{.TimeStart.Hour}}:{{.TimeStart.Minut}}:{{.TimeStart.Second}}</td>
-                                    <td>{{.TimeGoal.Year}}/{{.TimeGoal.Month}}/{{.TimeGoal.Day}} {{.TimeGoal.Hour}}:{{.TimeGoal.Minut}}:{{.TimeGoal.Second}}</td>
+                                    {{ if ne .TimeStart.Year 0 }}
+                                        <td>{{.TimeStart.Year}}/{{.TimeStart.Month}}/{{.TimeStart.Day}} {{.TimeStart.Hour}}:{{.TimeStart.Minut}}:{{.TimeStart.Second}}</td>
+                                        <td>{{.TimeGoal.Year}}/{{.TimeGoal.Month}}/{{.TimeGoal.Day}} {{.TimeGoal.Hour}}:{{.TimeGoal.Minut}}:{{.TimeGoal.Second}}</td>
+                                    {{ else }}
+                                        <td>-</td>
+                                        <td>-</td>
+                                    {{ end }}
                                 </tr>
                             {{ end }}
                         </tbody>
@@ -33,5 +49,24 @@
             </div>
         </div>
     </body>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const checkboxes = document.querySelectorAll('.inputclass');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('click', function() {
+                    if (this.checked) {
+                        checkboxes.forEach(cb => {
+                            cb.checked = false;
+                        });
+                        this.checked = true;
+
+                        fetch(`/attendance/status?status=running&id=` + this.name, {method: 'GET'});
+                    } else {
+                        fetch(`/attendance/status?status=stopping&id=` + this.name, {method: 'GET'});
+                    }
+                });
+            });
+        });
+    </script>
 </html>
 {{end}}
