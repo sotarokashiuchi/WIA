@@ -1400,7 +1400,7 @@
   (symbol (lib_id "Device:Buzzer") (at 215.9 125.73 0) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid 2b6301a3-5467-4fc1-bb31-50e77447df18)
-    (property "Reference" "BZ?" (id 0) (at 219.71 124.4599 0)
+    (property "Reference" "BZ2" (id 0) (at 219.71 124.4599 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "Buzzer" (id 1) (at 219.71 126.9999 0)
@@ -1419,7 +1419,7 @@
   (symbol (lib_id "power:GND") (at 213.36 132.08 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 31e494ea-4f3e-4a89-8b23-d516a4ba1b7e)
-    (property "Reference" "#PWR?" (id 0) (at 213.36 138.43 0)
+    (property "Reference" "#PWR01" (id 0) (at 213.36 138.43 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (id 1) (at 213.36 137.16 0))
@@ -1646,7 +1646,7 @@
   (symbol (lib_id "Device:R") (at 213.36 116.84 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 80799c2a-76f2-481e-9d8a-e460f9a28646)
-    (property "Reference" "R?" (id 0) (at 215.9 115.5699 0)
+    (property "Reference" "R6" (id 0) (at 215.9 115.5699 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "1kΩ" (id 1) (at 215.9 118.1099 0)
@@ -1840,6 +1840,9 @@
   )
 
   (symbol_instances
+    (path "/31e494ea-4f3e-4a89-8b23-d516a4ba1b7e"
+      (reference "#PWR01") (unit 1) (value "GND") (footprint "")
+    )
     (path "/9904f989-d762-428d-9557-3ffdcf9e2443"
       (reference "#PWR0101") (unit 1) (value "GND") (footprint "")
     )
@@ -1873,14 +1876,11 @@
     (path "/633c516f-3ce7-451a-b43a-d3b901fe654d"
       (reference "#PWR0111") (unit 1) (value "GND") (footprint "")
     )
-    (path "/31e494ea-4f3e-4a89-8b23-d516a4ba1b7e"
-      (reference "#PWR?") (unit 1) (value "GND") (footprint "")
-    )
     (path "/47bac56f-4f0f-44af-9cf2-8d596f7cfcf6"
       (reference "BZ1") (unit 1) (value "Buzzer") (footprint "")
     )
     (path "/2b6301a3-5467-4fc1-bb31-50e77447df18"
-      (reference "BZ?") (unit 1) (value "Buzzer") (footprint "")
+      (reference "BZ2") (unit 1) (value "Buzzer") (footprint "")
     )
     (path "/0728d564-ee5a-4755-9671-05558f596eca"
       (reference "D1") (unit 1) (value "LED_RED") (footprint "")
@@ -1913,7 +1913,7 @@
       (reference "R5") (unit 1) (value "1kΩ") (footprint "")
     )
     (path "/80799c2a-76f2-481e-9d8a-e460f9a28646"
-      (reference "R?") (unit 1) (value "1kΩ") (footprint "")
+      (reference "R6") (unit 1) (value "1kΩ") (footprint "")
     )
     (path "/673db0f5-6dcd-4be2-a2b8-55ffc79734bd"
       (reference "RFID1") (unit 1) (value "RC522") (footprint "")
