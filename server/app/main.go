@@ -229,8 +229,9 @@ func attendanceNewGET(c echo.Context) error {
 
 func attendanceNewPOST(c echo.Context) error {
 	attendances := loadAttendanceDB()
-	dateStart, _ := time.Parse("2006-01-02T15:04:05Z07:00", c.FormValue("dateStart")+"T"+c.FormValue("timeStart")+":00+"+"00:00")
-	dateGoal, _ := time.Parse("2006-01-02T15:04:05Z07:00", c.FormValue("dateGoal")+"T"+c.FormValue("timeGoal")+":00+"+"00:00")
+	dateStart, _ := time.Parse("2006-01-02T15:04:05Z07:00", c.FormValue("dateStart")+"T"+c.FormValue("timeStart")+":00+"+"09:00")
+	dateGoal, _ := time.Parse("2006-01-02T15:04:05Z07:00", c.FormValue("dateGoal")+"T"+c.FormValue("timeGoal")+":00+"+"09:00")
+	setAttendance := Attendance{}
 	if c.FormValue("submit") == "running" {
 		// runningの出席簿があればstoppingする
 		for i, attendance := range *attendances {
@@ -238,24 +239,30 @@ func attendanceNewPOST(c echo.Context) error {
 				(*attendances)[i].Status = "stopping"
 			}
 		}
-		createDB("./db/attendances.json", *attendances)
-
-		id := insertDB(
-			Attendance{
-				Name:   c.FormValue("name"),
-				Status: c.FormValue("submit"),
-			},
-		)
-		return c.Render(http.StatusOK, "attendanceCompleted", id)
+		setAttendance = Attendance{
+			Name:   c.FormValue("name"),
+			Status: "running",
+		}
 	}
-	id := insertDB(
-		Attendance{
+	if c.FormValue("submit") == "nil" {
+		setAttendance = Attendance{
 			Name:      c.FormValue("name"),
-			Status:    c.FormValue("submit"),
+			Status:    "nil",
 			TimeStart: transToSimpleTimeFromTime(dateStart),
 			TimeGoal:  transToSimpleTimeFromTime(dateGoal),
-		},
-	)
+		}
+		if time.Now().In(jst).After(dateStart) && time.Now().In(jst).Before(dateGoal) {
+			setAttendance.Status = "running"
+			for i, attendance := range *attendances {
+				if attendance.Status == "running" {
+					fmt.Println("stoppingss")
+					(*attendances)[i].Status = "stopping"
+				}
+			}
+		}
+	}
+	createDB("./db/attendances.json", *attendances)
+	id := insertDB(setAttendance)
 	return c.Render(http.StatusOK, "attendanceCompleted", id)
 }
 
