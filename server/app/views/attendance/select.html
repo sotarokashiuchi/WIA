@@ -60,7 +60,15 @@
                         });
                         this.checked = true;
 
-                        fetch(`/attendance/status?status=running&id=` + this.name, {method: 'GET'});
+                        fetch(`/attendance/status?status=running&id=` + this.name, {method: 'GET'})
+                        .then(response => {
+                            if (!response.ok) {
+                                console.log("err");
+                            }
+                        })
+                        .then(data => {
+                            location.reload();
+                        })
                     } else {
                         fetch(`/attendance/status?status=stopping&id=` + this.name, {method: 'GET'});
                     }

@@ -198,9 +198,7 @@ func nfcTouchPOST(c echo.Context) error {
 
 	// 受付中の出席管理があれば出席にする
 	for i, attendance := range *attendances {
-		fmt.Println(transToTimeFromSimpleTime(attendance.TimeStart))
-		if time.Now().In(jst).After(transToTimeFromSimpleTime(attendance.TimeStart)) && time.Now().In(jst).Before(transToTimeFromSimpleTime(attendance.TimeGoal)) {
-			// 受付中
+		if attendance.Status == "running" {
 			for _, serialNum := range attendance.SerialNumber {
 				if serialNum == serialNumber {
 					return c.JSON(http.StatusOK, user)
