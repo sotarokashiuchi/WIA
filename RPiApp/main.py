@@ -45,85 +45,52 @@ def readTagUID():
         rdr.wait_for_tag()
         (error, tag_type) = rdr.request()
         if not error:
-            print("Tag detected")
+            #print("Tag detected")
             (error, uid) = rdr.anticoll()
             if not error:
-                print("UID: " + str(uid))
+                #print("UID: " + str(uid))
                 return str(uid)
 
 def main():
-    # test program:NFC
-    while True:
-        rdr.wait_for_tag()
-        (error, tag_type) = rdr.request()
-        if not error:
-            print("Tag detected")
-            (error, uid) = rdr.anticoll()
-            if not error:
-                print("UID: " + str(uid))
-                # Select Tag is required before Auth
-                if not rdr.select_tag(uid):
-                    # Auth for block 10 (block 2 of sector 2) using default shipping key A
-                    if not rdr.card_auth(rdr.auth_a, 10, [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF], uid):
-                        # This will print something like (False, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-                        print("Reading block 10: " + str(rdr.read(10)))
-                        # Always stop crypto1 when done working
-                        rdr.stop_crypto()
-
-    # test program:Buzzer
-    buzzerPWM.beepUntilTime(440, 3)
-
-    while(1):
-        lcd.lcd_string("Created by ",lcd.LCD_LINE_1)
-        lcd.lcd_string("Osoyoo.com ",lcd.LCD_LINE_2)
-        time.sleep(3)
-
-        lcd.lcd_string("> Tutorial Url:",lcd.LCD_LINE_1)
-        lcd.lcd_string("> http://osoyoo.com",lcd.LCD_LINE_2)
-        time.sleep(3)
-
-        lcd.lcd_string("> ワタシノナマエハ",lcd.LCD_LINE_1)
-        lcd.lcd_string("> バビブペピョ",lcd.LCD_LINE_2)
-        time.sleep(3)
-    return
-
     serialNumber = ""
     name = ""
     while True:
         # NFC読み取り処理
         serialNumber = readTagUID()
+        print(serialNumber)
 
-        if serialNumber != "":
-            if serialNumber != "学生証のデータ形式ではない":
-                # 学生証ではない
-                buzzerPWM.beep(440)
-                lcd.lcd_string("Error", lcd.LCD_LINE_1)
-                lcd.lcd_string("Failed to Read", lcd.LCD_LINE_2)
-                GPIO.output(BUZZER, HIGH)
-                GPIO.output(LED_RED, LOW)
-            else:
-                name = requestNFCToch(serialNumber)
-                if name == "":
-                    # 名前の未登録
-                    buzzerPWM.beep(440)
-                    lcd.lcd_string("Warning", lcd.LCD_LINE_1)
-                    lcd.lcd_string("Not Registered", lcd.LCD_LINE_2)
-                    GPIO.output(BUZZER, HIGH)
-                    GPIO.output(LED_BLUE, HIGH)
-                else:
-                    # 正常処理
-                    buzzerPWM.beep(440)
-                    lcd.lcd_string("Completed!", lcd.LCD_LINE_1)
-                    lcd.lcd_string(name, lcd.LCD_LINE_2)
-                    GPIO.output(BUZZER, HIGH)
-                    GPIO.output(LED_GREEN, HIGH)
-            
-            time.sleep(0.5)
-            GPIO.output(LED_GREEN, LOW)
-            GPIO.output(LED_BLUE, LOW)
-            GPIO.output(LED_RED, LOW)
-            GPIO.output(BUZZER, LOW)
-            lcd.lcd_init()
+        #if serialNumber != "":
+        #    if serialNumber != "学生証のデータ形式ではない":
+        #        # 学生証ではない
+        #        buzzerPWM.beep(440)
+        #        lcd.lcd_string("Error", lcd.LCD_LINE_1)
+        #        lcd.lcd_string("Failed to Read", lcd.LCD_LINE_2)
+        #        GPIO.output(BUZZER, HIGH)
+        #        GPIO.output(LED_RED, LOW)
+        #else:
+        name = requestNFCToch(serialNumber)
+        if name == "":
+            # 名前の未登録
+            buzzerPWM.beep(440)
+            lcd.lcd_string("Warning", lcd.LCD_LINE_1)
+            lcd.lcd_string("Not Registered", lcd.LCD_LINE_2)
+            GPIO.output(BUZZER, HIGH)
+            GPIO.output(LED_BLUE, HIGH)
+        else:
+            # 正常処理
+            requestNFCToch(serialNumber)
+            buzzerPWM.beep(440)
+            lcd.lcd_string("Completed!", lcd.LCD_LINE_1)
+            lcd.lcd_string(name, lcd.LCD_LINE_2)
+            GPIO.output(BUZZER, HIGH)
+            GPIO.output(LED_GREEN, HIGH)
+        
+        time.sleep(0.5)
+        GPIO.output(LED_GREEN, LOW)
+        GPIO.output(LED_BLUE, LOW)
+        GPIO.output(LED_RED, LOW)
+        GPIO.output(BUZZER, LOW)
+        lcd.lcd_init()
     return
 
 if __name__ == '__main__':
