@@ -25,3 +25,4 @@ class Tone:
     def destroy(self):
         self.none()
         GPIO.cleanup()
+

@@ -21,7 +21,6 @@ def initialize():
     GPIO.setup(LED_RED, GPIO.OUT, initial=GPIO.LOW)
     GPIO.setup(LED_GREEN, GPIO.OUT, initial=GPIO.LOW)
     GPIO.setup(LED_BLUE, GPIO.OUT, initial=GPIO.LOW)
-    # GPIO.setup(BUZZER, GPIO.OUT, initial=GPIO.LOW)
     lcd.lcd_init()
 
 def finalize():
@@ -67,7 +66,7 @@ def main():
         #        lcd.lcd_string("Failed to Read", lcd.LCD_LINE_2)
         #        GPIO.output(BUZZER, HIGH)
         #        GPIO.output(LED_RED, LOW)
-        #else:
+
         name = requestNFCToch(serialNumber)
         if name == "":
             # 名前の未登録
@@ -79,7 +78,7 @@ def main():
         else:
             # 正常処理
             requestNFCToch(serialNumber)
-            buzzerPWM.beep(440)
+            buzzerPWM.beep(770)
             lcd.lcd_string("Completed!", lcd.LCD_LINE_1)
             lcd.lcd_string(name, lcd.LCD_LINE_2)
             GPIO.output(BUZZER, HIGH)
@@ -89,7 +88,7 @@ def main():
         GPIO.output(LED_GREEN, LOW)
         GPIO.output(LED_BLUE, LOW)
         GPIO.output(LED_RED, LOW)
-        GPIO.output(BUZZER, LOW)
+        buzzerPWM.none()
         lcd.lcd_init()
     return
 
