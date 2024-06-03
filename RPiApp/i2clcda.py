@@ -87,7 +87,7 @@ def lcd_string(message, line):
     j = 0
     while i < LCD_WIDTH:
         j += 1
-        if len(message) <= j:
+        if len(message) < j:
             # 余白を空白文字で埋める
             lcd_byte(ord(" "), LCD_CHR)
             i += 1
