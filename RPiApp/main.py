@@ -21,7 +21,7 @@ def initialize():
     GPIO.setup(LED_RED, GPIO.OUT, initial=GPIO.LOW)
     GPIO.setup(LED_GREEN, GPIO.OUT, initial=GPIO.LOW)
     GPIO.setup(LED_BLUE, GPIO.OUT, initial=GPIO.LOW)
-    GPIO.setup(BUZZER, GPIO.OUT, initial=GPIO.LOW)
+    # GPIO.setup(BUZZER, GPIO.OUT, initial=GPIO.LOW)
     lcd.lcd_init()
 
 def finalize():

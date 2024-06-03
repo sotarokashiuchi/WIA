@@ -4,7 +4,8 @@ import time
 class Tone:
     # Initialize an instance by specifying PWM pin number
     def __init__(self, pwm_pin):
-        self.pwm = GPIO.PWM(pwm_pin, 0)
+        GPIO.setup(pwm_pin, GPIO.OUT, initial=GPIO.LOW)
+        self.pwm = GPIO.PWM(pwm_pin, 1)
  
     # Beep a tone by specifying frequency and duty
     def beep(self, freq, duty=0.5):
