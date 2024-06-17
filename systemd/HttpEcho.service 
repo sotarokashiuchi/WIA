@@ -1,0 +1,15 @@
+[Unit]
+Description = HttpEcho.service daemon
+After=network.target
+
+[Service]
+ExecStart=/home/denki/ACPj/server/app/main
+WorkingDirectory=/home/denki/ACPj/server/app
+Restart=always
+Type=simple
+User=denki
+Group=denki
+
+[Install]
+WantedBy = multi-user.target
+root@raspberrypi:/lib/systemd/system# 

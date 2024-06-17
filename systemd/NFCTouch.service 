@@ -1,0 +1,14 @@
+[Unit]
+Description = NFCTouch.service daemon
+After=network
+
+[Service]
+ExecStart=/usr/bin/python3 /home/denki/ACPj/RPiApp/main.py
+WorkingDirectory=/home/denki/ACPj/RPiApp
+Restart=always
+Type=simple
+User=denki
+Group=denki
+
+[Install]
+WantedBy = multi-user.target
