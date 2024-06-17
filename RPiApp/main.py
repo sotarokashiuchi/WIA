@@ -22,6 +22,8 @@ def initialize():
     GPIO.setup(LED_GREEN, GPIO.OUT, initial=GPIO.LOW)
     GPIO.setup(LED_BLUE, GPIO.OUT, initial=GPIO.LOW)
     lcd.lcd_init()
+    lcd.lcd_string("> Completed", lcd.LCD_LINE_1)
+    lcd.lcd_string("> Initialize!!", lcd.LCD_LINE_2)
 
 def finalize():
     GPIO.cleanup()
@@ -53,20 +55,18 @@ def readTagUID():
 def main():
     serialNumber = ""
     name = ""
+    oldSerialNumber = ""
+    oldTimeStanp = 0
     while True:
         # NFC読み取り処理
+        oldSerialNumber = serialNumber
+        oldTimeStanp = time.time()
         serialNumber = readTagUID()
+        if oldSerialNumber == serialNumber and time.time()-oldTimeStanp < 0.01:
+            time.sleep(0.1)
+            continue
+        
         print(serialNumber)
-
-        #if serialNumber != "":
-        #    if serialNumber != "学生証のデータ形式ではない":
-        #        # 学生証ではない
-        #        buzzerPWM.beep(440)
-        #        lcd.lcd_string("Error", lcd.LCD_LINE_1)
-        #        lcd.lcd_string("Failed to Read", lcd.LCD_LINE_2)
-        #        GPIO.output(BUZZER, HIGH)
-        #        GPIO.output(LED_RED, LOW)
-
         name = requestNFCToch(serialNumber)
         if name == "":
             # 名前の未登録
@@ -75,16 +75,17 @@ def main():
             lcd.lcd_string("Not Registered", lcd.LCD_LINE_2)
             GPIO.output(BUZZER, HIGH)
             GPIO.output(LED_BLUE, HIGH)
+            time.sleep(0.4)
         else:
             # 正常処理
             requestNFCToch(serialNumber)
-            buzzerPWM.beep(770)
+            buzzerPWM.beep(2000)
             lcd.lcd_string("Completed!", lcd.LCD_LINE_1)
             lcd.lcd_string(name, lcd.LCD_LINE_2)
             GPIO.output(BUZZER, HIGH)
             GPIO.output(LED_GREEN, HIGH)
+            time.sleep(0.4)
         
-        time.sleep(0.5)
         GPIO.output(LED_GREEN, LOW)
         GPIO.output(LED_BLUE, LOW)
         GPIO.output(LED_RED, LOW)
