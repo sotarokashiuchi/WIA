@@ -121,8 +121,6 @@ func main() {
 
 // Handler
 func reset(c echo.Context) error {
-	c.Response().Header().Set("Cache-Control", "no-store")
-
 	attendanceFile, err := os.Create("./db/attendances.json")
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "Server Error")
@@ -137,13 +135,12 @@ func reset(c echo.Context) error {
 	defer userFile.Close()
 	userFile.WriteString("[]")
 
-	return c.Redirect(http.StatusPermanentRedirect, "/")
+	return c.Redirect(http.StatusFound, "/")
 }
 
 func sample(c echo.Context) error {
 	createTestDB()
-	c.Response().Header().Set("Cache-Control", "no-store")
-	return c.Redirect(http.StatusPermanentRedirect, "/")
+	return c.Redirect(http.StatusFound, "/")
 }
 
 func index(c echo.Context) error {
