@@ -89,7 +89,6 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 func main() {
 	jst, _ = time.LoadLocation("Asia/Tokyo")
 	fmt.Print("\n\n")
-	createTestDB()
 	t := &Template{
 		templates: template.Must(template.ParseGlob("views/*/*.html")),
 	}
@@ -104,6 +103,8 @@ func main() {
 	// Routes
 	e.Static("/static", "static")
 	e.GET("/", index)
+	e.GET("/reset", reset)
+	e.GET("/sample", sample)
 	e.POST("/nfc/touch", nfcTouchPOST)
 	e.GET("/user/edit", userEditGET)
 	e.POST("/user/edit", userEditPOST)
@@ -119,6 +120,32 @@ func main() {
 }
 
 // Handler
+func reset(c echo.Context) error {
+	c.Response().Header().Set("Cache-Control", "no-store")
+
+	attendanceFile, err := os.Create("./db/attendances.json")
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Server Error")
+	}
+	defer attendanceFile.Close()
+	attendanceFile.WriteString("[{}]")
+
+	userFile, err := os.Create("./db/users.json")
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Server Error")
+	}
+	defer userFile.Close()
+	userFile.WriteString("[]")
+
+	return c.Redirect(http.StatusPermanentRedirect, "/")
+}
+
+func sample(c echo.Context) error {
+	createTestDB()
+	c.Response().Header().Set("Cache-Control", "no-store")
+	return c.Redirect(http.StatusPermanentRedirect, "/")
+}
+
 func index(c echo.Context) error {
 	return c.Render(http.StatusOK, "index", "")
 }
