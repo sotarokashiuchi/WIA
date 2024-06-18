@@ -74,8 +74,9 @@ def main():
             lcd.lcd_string("Warning", lcd.LCD_LINE_1)
             lcd.lcd_string("Not Registered", lcd.LCD_LINE_2)
             GPIO.output(BUZZER, HIGH)
-            GPIO.output(LED_BLUE, HIGH)
-            time.sleep(0.4)
+            GPIO.output(LED_RED, HIGH)
+            time.sleep(0.05)
+            buzzerPWM.none()
         else:
             # 正常処理
             requestNFCToch(serialNumber)
@@ -83,13 +84,14 @@ def main():
             lcd.lcd_string("Completed!", lcd.LCD_LINE_1)
             lcd.lcd_string(name, lcd.LCD_LINE_2)
             GPIO.output(BUZZER, HIGH)
-            GPIO.output(LED_GREEN, HIGH)
-            time.sleep(0.4)
+            GPIO.output(LED_BLUE, HIGH)
+            time.sleep(0.05)
+            buzzerPWM.none()
         
+        time.sleep(0.35)
         GPIO.output(LED_GREEN, LOW)
         GPIO.output(LED_BLUE, LOW)
         GPIO.output(LED_RED, LOW)
-        buzzerPWM.none()
         lcd.lcd_init()
     return
 
