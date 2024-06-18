@@ -66,13 +66,14 @@ def main():
             time.sleep(0.1)
             continue
         
-        print(serialNumber)
         name = requestNFCToch(serialNumber)
+        lcd.lcd_display_off()
         if name == "":
             # 名前の未登録
             buzzerPWM.beep(440)
             lcd.lcd_string("Warning", lcd.LCD_LINE_1)
             lcd.lcd_string("Not Registered", lcd.LCD_LINE_2)
+            lcd.lcd_display_on()
             GPIO.output(BUZZER, HIGH)
             GPIO.output(LED_RED, HIGH)
             time.sleep(0.05)
@@ -83,12 +84,13 @@ def main():
             buzzerPWM.beep(2000)
             lcd.lcd_string("Completed!", lcd.LCD_LINE_1)
             lcd.lcd_string(name, lcd.LCD_LINE_2)
+            lcd.lcd_display_on()
             GPIO.output(BUZZER, HIGH)
             GPIO.output(LED_BLUE, HIGH)
             time.sleep(0.05)
             buzzerPWM.none()
         
-        time.sleep(0.35)
+        time.sleep(0.75)
         GPIO.output(LED_GREEN, LOW)
         GPIO.output(LED_BLUE, LOW)
         GPIO.output(LED_RED, LOW)
