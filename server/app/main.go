@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"sort"
 	"strconv"
 	"time"
@@ -114,6 +116,9 @@ func main() {
 	e.GET("/attendance/status", attendanceStatusGET)
 	e.GET("/attendance/new", attendanceNewGET)
 	e.POST("/attendance/new", attendanceNewPOST)
+	e.GET("/attendance/manual", attendanceManualGET)
+	e.POST("/attendance/manual", attendanceManualPOST)
+	e.GET("/setting/time", settingTimeGET)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1234"))
@@ -288,6 +293,39 @@ func attendanceNewPOST(c echo.Context) error {
 	createDB("./db/attendances.json", *attendances)
 	id := insertDB(setAttendance)
 	return c.Render(http.StatusOK, "attendanceCompleted", id)
+}
+
+func attendanceManualGET(c echo.Context) error {
+	users := loadUsersDB()
+	return c.Render(http.StatusOK, "attendanceManual", *users)
+}
+
+func attendanceManualPOST(c echo.Context) error {
+	return c.String(http.StatusOK, "OK")
+}
+
+func settingTimeGET(c echo.Context) error {
+	setTime, _ := time.Parse("2006-01-02T15:04:05.999Z", c.QueryParam(("time")))
+	setTime = setTime.In(jst)
+
+	dateArg := fmt.Sprintf("%d/%02d/%02d %02d:%02d",
+		setTime.Year(),
+		setTime.Month(),
+		setTime.Day(),
+		setTime.Hour(),
+		setTime.Minute(),
+	)
+
+	cmd := exec.Command("sudo", "date", "-s", dateArg)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	err := cmd.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return c.String(http.StatusOK, "OK")
 }
 
 func attendanceSelectGET(c echo.Context) error {
