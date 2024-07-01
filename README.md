@@ -9,6 +9,11 @@ sudo systemctl daemon-reload
 sudo systemctl enable NFCTouch.service
 sudo systemctl enable HttpEcho.service
 
+# setting shutdown pin
+sudo vi /boot/config.txt
+# add to /boot/config.txt
+dtoverlay=gpio-shutdown,gpio_pin=4,debounce=2000
+
 # reboot
 sudo reboot
 ```
