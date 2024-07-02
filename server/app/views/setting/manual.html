@@ -1,0 +1,61 @@
+{{define "settingIndex"}}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>手動入力</title>
+    {{ template "head" }}
+</head>
+<script>
+    function setTime() {
+        const currentTime = new Date().toISOString();
+        const url = `/setting/time?time=${currentTime}`;
+
+        fetch(url)
+            .then(response => response.text())
+            .then(data => console.log(data))
+    }
+</script>
+
+<body>
+    {{ template "header" }}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-10">
+                <h2>時刻設定</h2>
+                <div class="my-4">
+                    <button onclick="setTime()"  class="btn btn-outline-primary col-12">時刻を同期</button>
+                </div>
+                <br>
+                <h2>手動出席</h2>
+                <form action="/setting/nfcTouch" method="post">
+                    <div class="mb-2">
+                        <label class="form-label">名前</label>
+                        <select class="form-select" name="SerialNumber">
+                            {{ range . }}
+                            <option value="{{ .SerialNumber }}">{{ .Name }}</option>
+                            {{ end }}
+                        </select>
+                    </div>
+                    <div class="my-4">
+                        <button type="submit" class="btn btn-outline-primary col-12">出席</button>
+                    </div>
+                </form>
+                <br>
+                <h2>手動ユーザー登録</h2>
+                <form action="/setting/adduser" method="post">
+                    <div class="mb-2">
+                        <label class="form-label">名前</label>
+                        <input type="text" class="form-control" name="SerialNumber">
+                    </div>
+                    <div class="my-4">
+                        <button type="submit" class="btn btn-outline-primary col-12">追加</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+{{end}}

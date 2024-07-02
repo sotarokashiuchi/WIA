@@ -116,8 +116,8 @@ func main() {
 	e.GET("/attendance/status", attendanceStatusGET)
 	e.GET("/attendance/new", attendanceNewGET)
 	e.POST("/attendance/new", attendanceNewPOST)
-	e.GET("/attendance/manual", attendanceManualGET)
-	e.POST("/attendance/manual", attendanceManualPOST)
+	e.GET("/setting/", settingIndexGET)
+	e.POST("/setting/nfcTouch", settingNfcTouchPOST)
 	e.GET("/setting/time", settingTimeGET)
 
 	// Start server
@@ -297,15 +297,15 @@ func attendanceNewPOST(c echo.Context) error {
 	return c.Render(http.StatusOK, "attendanceCompleted", id)
 }
 
-func attendanceManualGET(c echo.Context) error {
+func settingIndexGET(c echo.Context) error {
 	users := loadUsersDB()
-	return c.Render(http.StatusOK, "attendanceManual", *users)
+	return c.Render(http.StatusOK, "settingIndex", *users)
 }
 
-func attendanceManualPOST(c echo.Context) error {
+func settingNfcTouchPOST(c echo.Context) error {
 	serialNumber := c.FormValue("SerialNumber")
 	nfcTouch(serialNumber)
-	return c.Redirect(http.StatusFound, "/attendance/manual")
+	return c.Redirect(http.StatusFound, "/setting/")
 }
 
 func settingTimeGET(c echo.Context) error {
