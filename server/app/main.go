@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"os/exec"
@@ -119,6 +120,7 @@ func main() {
 	e.GET("/setting/", settingIndexGET)
 	e.POST("/setting/nfcTouch", settingNfcTouchPOST)
 	e.GET("/setting/time", settingTimeGET)
+	e.POST("/setting/adduser", settingAdduserPOST)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1234"))
@@ -330,6 +332,32 @@ func settingTimeGET(c echo.Context) error {
 	}
 
 	return c.String(http.StatusOK, "OK")
+}
+
+func settingAdduserPOST(c echo.Context) error {
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	UserName := c.FormValue("UserName")
+	var serialNumber string
+
+	users := loadUsersDB()
+	for {
+		serialNumber = fmt.Sprintf("[%d, %d, %d, %d, %d]", rng.Intn(255), rng.Intn(255), rng.Intn(255), rng.Intn(255), rng.Intn(255))
+		for _, user := range *users {
+			if user.SerialNumber == serialNumber {
+				continue
+			}
+		}
+		break
+	}
+
+	*users = append(*users, User{
+		SerialNumber: serialNumber,
+		Name: UserName,
+		TimeStanp:    transToSimpleTimeFromTime(time.Now().In(jst)),
+	})
+	createDB("./db/users.json", *users)
+
+	return c.Redirect(http.StatusFound, "/setting/")
 }
 
 func attendanceSelectGET(c echo.Context) error {
