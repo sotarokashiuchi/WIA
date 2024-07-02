@@ -204,6 +204,11 @@ func nfcTouchPOST(c echo.Context) error {
 	*/
 
 	serialNumber := c.FormValue("serialNumber")
+	user := nfcTouch(serialNumber)
+	return c.JSON(http.StatusOK, user)
+}
+
+func nfcTouch(serialNumber string) User {
 	user := searchSerialNumber(serialNumber)
 	attendances := loadAttendanceDB()
 
@@ -228,15 +233,14 @@ func nfcTouchPOST(c echo.Context) error {
 		if attendance.Status == "running" {
 			for _, serialNum := range attendance.SerialNumber {
 				if serialNum == serialNumber {
-					return c.JSON(http.StatusOK, user)
+					return user
 				}
 			}
 			(*attendances)[i].SerialNumber = append(attendance.SerialNumber, serialNumber)
 			createDB("./db/attendances.json", *attendances)
 		}
 	}
-
-	return c.JSON(http.StatusOK, user)
+	return user
 }
 
 func attendanceNewGET(c echo.Context) error {
@@ -299,7 +303,9 @@ func attendanceManualGET(c echo.Context) error {
 }
 
 func attendanceManualPOST(c echo.Context) error {
-	return c.String(http.StatusOK, "OK")
+	serialNumber := c.FormValue("SerialNumber")
+	nfcTouch(serialNumber)
+	return c.Redirect(http.StatusFound, "/attendance/manual")
 }
 
 func settingTimeGET(c echo.Context) error {
