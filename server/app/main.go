@@ -207,23 +207,21 @@ func nfcTouchPOST(c echo.Context) error {
 	user := searchSerialNumber(serialNumber)
 	attendances := loadAttendanceDB()
 
-	if user.Name == "" {
-		// usersDBに登録
-		users := loadUsersDB()
-		if user.SerialNumber == "" {
-			*users = append(*users, User{
-				SerialNumber: serialNumber,
-				TimeStanp:    transToSimpleTimeFromTime(time.Now().In(jst)),
-			})
-		} else {
-			for i, user := range *users {
-				if user.SerialNumber == serialNumber {
-					(*users)[i].TimeStanp = transToSimpleTimeFromTime(time.Now().In(jst))
-				}
+	// usersDBに登録
+	users := loadUsersDB()
+	if user.SerialNumber == "" {
+		*users = append(*users, User{
+			SerialNumber: serialNumber,
+			TimeStanp:    transToSimpleTimeFromTime(time.Now().In(jst)),
+		})
+	} else {
+		for i, user := range *users {
+			if user.SerialNumber == serialNumber {
+				(*users)[i].TimeStanp = transToSimpleTimeFromTime(time.Now().In(jst))
 			}
 		}
-		createDB("./db/users.json", *users)
 	}
+	createDB("./db/users.json", *users)
 
 	// 受付中の出席管理があれば出席にする
 	for i, attendance := range *attendances {
