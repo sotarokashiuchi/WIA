@@ -4,6 +4,8 @@ import time
 import i2clcda as lcd
 from pirc522 import RFID
 import tone
+import encoder as ENCODER
+import subprocess
 
 HIGH = 1
 LOW = 0
@@ -24,6 +26,7 @@ SW_OFF = 1
 
 rdr = RFID(pin_rst=25, pin_irq=24, pin_mode=GPIO.BCM)
 buzzerPWM = tone.Tone(BUZZER)
+encoder = ENCODER.Encoder(ROTARY_ENCODER_A, ROTARY_ENCODER_B)
 
 def initialize():
     GPIO.setmode(GPIO.BCM)
@@ -38,9 +41,11 @@ def initialize():
     GPIO.setup(PREVIOUS_BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(DONE_BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(HOME_BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
     lcd.lcd_init()
     lcd.lcd_string("> Completed", lcd.LCD_LINE_1)
     lcd.lcd_string("> Initialize!!", lcd.LCD_LINE_2)
+
 
 def finalize():
     GPIO.cleanup()
@@ -85,6 +90,7 @@ def menu():
                     ]
                 ]
     lcd_menu_index=0
+
     while GPIO.input(DONE_BUTTON)!=SW_ON:
         lcd.lcd_string(lcd_menu[lcd_menu_index][0], lcd.LCD_LINE_1)
         lcd.lcd_string(lcd_menu[lcd_menu_index][1], lcd.LCD_LINE_2)
@@ -103,6 +109,8 @@ def menu():
                 lcd_menu_index=0
             wait_sw_off(PREVIOUS_BUTTON)
     
+    wait_sw_off(DONE_BUTTON)
+
     if lcd_menu_index==0:
         set_attendance()
     elif lcd_menu_index==1:
@@ -114,7 +122,77 @@ def set_attendance():
     pass
 
 def set_time():
-    pass
+    lcd_time = [
+              # "YYYY/MM/DD HH:MM",
+                "   ^            ",
+                "      ^         ",
+                "         ^      ",
+                "            ^   ",
+                "               ^",
+            ]
+    lcd_time_index=0
+    lcd_count=250
+
+    now_time = subprocess.check_output(["sudo", "hwclock", "-r"])
+    now_time = now_time.decode('utf-8')
+    setting_time = [
+            int(now_time[0:4]),
+            int(now_time[5:7]),
+            int(now_time[8:10]),
+            int(now_time[11:13]),
+            int(now_time[14:16])
+        ]
+
+
+    while GPIO.input(DONE_BUTTON)!=0:
+        if lcd_count==250:
+            lcd.lcd_string(str(setting_time[0]).zfill(4)+"/"+str(setting_time[1]             ).zfill(2)+"/"+str(setting_time[2]).zfill(2)+" "+str(setting_time[3]).zfill(2)+"             :"+str(setting_time[4]).zfill(2), lcd.LCD_LINE_1)
+            lcd.lcd_string(lcd_time[lcd_time_index], lcd.LCD_LINE_2)
+            # lcd.lcd_display_on()
+            lcd_count=0
+        else:
+            lcd_count=lcd_count+1
+
+        if GPIO.input(HOME_BUTTON)==0:
+            wait_sw_off(HOME_BUTTON)
+            return
+        if GPIO.input(NEXT_BUTTON)==0:
+            lcd_time_index=lcd_time_index+1
+            if lcd_time_index >= 5:
+                lcd_time_index=4
+            wait_sw_off(NEXT_BUTTON)
+        if GPIO.input(PREVIOUS_BUTTON)==0:
+            lcd_time_index=lcd_time_index-1
+            if lcd_time_index < 0:
+                lcd_time_index=0
+            wait_sw_off(PREVIOUS_BUTTON)
+
+        encoder.set(setting_time[lcd_time_index])
+        data = encoder.read()
+        if lcd_time_index==1:
+            if data>12:
+                data=1
+            if data<=0:
+                data=12
+        elif lcd_time_index==2:
+            if data>31:
+                data=1
+            if data<=0:
+                data=31
+        elif lcd_time_index==3:
+            if data>23:
+                data=0
+            if data<0:
+                data=23
+        elif lcd_time_index==4:
+            if data>59:
+                data=0
+            if data<0:
+                data=59
+        setting_time[lcd_time_index] = data
+
+    subprocess.call(["sudo", "date", "-s", str(setting_time[0]).zfill(4)+"/"+str             (setting_time[1]).zfill(2)+"/"+str(setting_time[2]).zfill(2)+" "+str(setting_tim             e[3]).zfill(2)+":"+str(setting_time[4]).zfill(2)])
+    subprocess.call(["sudo", "hwclock", "-w"])
 
 def get_wifi():
     pass
