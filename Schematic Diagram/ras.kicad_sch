@@ -2172,7 +2172,7 @@
 					)
 				)
 			)
-			(property "Footprint" ""
+			(property "Footprint" "project:raspberrypi3"
 				(at 30.48 22.86 0)
 				(effects
 					(font
@@ -2907,78 +2907,6 @@
 						)
 					)
 				)
-				(pin bidirectional line
-					(at 73.66 -53.34 180)
-					(length 5.08)
-					(name "RUN_1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "41"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at 73.66 -55.88 180)
-					(length 5.08)
-					(name "RUN_2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "42"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at 73.66 -58.42 180)
-					(length 5.08)
-					(name "TV_+"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "43"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at 73.66 -60.96 180)
-					(length 5.08)
-					(name "TV_-"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "44"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
 			)
 			(symbol "Raspberry_Pi_2_3_0_1"
 				(polyline
@@ -3366,24 +3294,12 @@
 		(uuid "1e7ca00a-687a-4665-9cfe-70ec16cb7bca")
 	)
 	(no_connect
-		(at 213.36 82.55)
-		(uuid "2572d9ea-100b-4807-98c4-3998b099ee86")
-	)
-	(no_connect
-		(at 213.36 74.93)
-		(uuid "3c0d27cd-9c13-46dd-8956-241706838c82")
-	)
-	(no_connect
 		(at 139.7 41.91)
 		(uuid "55909855-03e4-44f8-9c3a-d2c234c46744")
 	)
 	(no_connect
 		(at 213.36 34.29)
 		(uuid "73ea6275-3bab-4a5d-9e17-c6b32c76f00a")
-	)
-	(no_connect
-		(at 213.36 80.01)
-		(uuid "8e6ed0a7-4875-414e-8ec4-cc31e35eaa81")
 	)
 	(no_connect
 		(at 213.36 64.77)
@@ -3408,10 +3324,6 @@
 	(no_connect
 		(at 213.36 24.13)
 		(uuid "e3471ff4-4ac2-48a2-bd0b-810e7f180095")
-	)
-	(no_connect
-		(at 213.36 77.47)
-		(uuid "e3e4bb5e-13e8-49ec-b797-bc4bcc3a5a11")
 	)
 	(no_connect
 		(at 139.7 54.61)
@@ -6659,7 +6571,7 @@
 				)
 			)
 		)
-		(property "Value" "SW_Push"
+		(property "Value" "DONE"
 			(at 138.43 160.02 0)
 			(effects
 				(font
@@ -6879,7 +6791,7 @@
 				)
 			)
 		)
-		(property "Footprint" "project:PinSocket_2x20_P2.54mm_Vertical"
+		(property "Footprint" "project:raspberrypi3"
 			(at 170.18 -1.27 0)
 			(effects
 				(font
@@ -7033,18 +6945,6 @@
 		)
 		(pin "40"
 			(uuid "1ef4c461-77ae-486e-a081-eae9ca68b50e")
-		)
-		(pin "41"
-			(uuid "fff7795c-54eb-4530-a003-d8e06a9f1740")
-		)
-		(pin "42"
-			(uuid "1b164061-1860-4cc8-b2d6-fd6c915b790e")
-		)
-		(pin "43"
-			(uuid "181640ea-a525-4549-9f44-f6f5d67231f7")
-		)
-		(pin "44"
-			(uuid "8f3bd2c3-6002-4f09-be8c-0fe1fb5d2961")
 		)
 		(pin "5"
 			(uuid "bba21995-2935-44b9-ba21-9d4a7b9af09c")
@@ -7305,7 +7205,7 @@
 				)
 			)
 		)
-		(property "Value" "SW_Push"
+		(property "Value" "PREVIOUS"
 			(at 110.49 130.81 0)
 			(effects
 				(font
@@ -7372,7 +7272,7 @@
 				)
 			)
 		)
-		(property "Value" "SW_Push"
+		(property "Value" "HOME"
 			(at 97.79 130.81 0)
 			(effects
 				(font
@@ -7573,7 +7473,7 @@
 				)
 			)
 		)
-		(property "Value" "SW_Push"
+		(property "Value" "SHUTDOWN"
 			(at 95.25 119.38 0)
 			(effects
 				(font
@@ -7640,7 +7540,7 @@
 				)
 			)
 		)
-		(property "Value" "SW_Push"
+		(property "Value" "MENU"
 			(at 107.95 119.38 0)
 			(effects
 				(font
@@ -7707,7 +7607,7 @@
 				)
 			)
 		)
-		(property "Value" "SW_Push"
+		(property "Value" "NEXT"
 			(at 120.65 119.38 0)
 			(effects
 				(font
