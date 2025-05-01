@@ -455,8 +455,13 @@
     }
   },
   "libraries": {
-    "pinned_footprint_libs": [],
-    "pinned_symbol_libs": []
+    "pinned_footprint_libs": [
+      "project",
+      "raspberrypi"
+    ],
+    "pinned_symbol_libs": [
+      "project"
+    ]
   },
   "meta": {
     "filename": "ras.kicad_pro",
@@ -611,7 +616,7 @@
       "meta": {
         "version": 0
       },
-      "model_mode": 0,
+      "model_mode": 4,
       "workbook_filename": ""
     },
     "page_layout_descr_file": "",
