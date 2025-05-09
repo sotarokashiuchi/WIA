@@ -125,14 +125,14 @@
 		(uuid "4a0c037a-40a1-4e04-8cad-6253a760f31c")
 	)
 	(fp_line
-		(start 0.2 8)
-		(end 63.7 8)
+		(start 63.7 8)
+		(end 3.5 8)
 		(stroke
 			(width 0.12)
 			(type solid)
 		)
 		(layer "F.SilkS")
-		(uuid "935b290e-d0c0-4b09-b58a-d7e0b3423fa1")
+		(uuid "a10d53a1-182d-4624-a6c8-018df899696f")
 	)
 	(fp_line
 		(start 63.70066 23)
