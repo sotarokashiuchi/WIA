@@ -18,7 +18,19 @@ WIAは、学生証を用いて出席確認を自動化し、手間やミスを�
 - シャットダウン機能
 
 ## システム構成
-![](./system_configuration.drawio.svg)
+![システム構成](./_attachment/system_configuration.drawio.svg)
+
+## デモンストレーション
+### ユーザ登録
+![ユーザ登録](./_attachment/register.png)
+
+### 出席簿作成
+![出席簿作成](./_attachment/create.png)
+
+### 出席簿
+![出席簿一覧](./_attachment/attendant-list.png)
+
+![出席者一覧](./_attachment/user-list.png)
 
 ## Setup
 ```shell
