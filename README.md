@@ -1,6 +1,9 @@
 # WIA (Who Is Absent)
 WIAは、学生証を用いて出席確認を自動化し、手間やミスを削減するための出席管理システムです。パソコンやスマートフォンなど、すべての端末から操作可能で、オフラインで完結するのが特徴です。
 
+![hardware](./_attachment/hardware2.jpg)  
+![hardware](./_attachment/hardware3.jpg)
+
 ## 特徴
 - 学生証を利用した出席確認
 - 高速かつ正確な一括出席管理
