@@ -240,8 +240,30 @@ func nfcTouch(serialNumber string) User {
 			}
 			(*attendances)[i].SerialNumber = append(attendance.SerialNumber, serialNumber)
 			createDB("./db/attendances.json", *attendances)
+			return user
 		}
 	}
+
+	// 受付中の出席管理が存在しないので、今日の日付の出席管理を作成する
+	nowTime := time.Now()
+	today := (strconv.Itoa(nowTime.Year()) +"/"+ strconv.Itoa(int(nowTime.Month())) +"/"+ strconv.Itoa(nowTime.Day()))
+
+	for _, attendance := range *attendances {
+		if attendance.Name == today {
+			return user
+		}
+	}
+
+	setAttendance := Attendance{
+		Name:      today,
+		Status:    "running",
+		TimeStart: transToSimpleTimeFromTime(time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 0, 0, 0, 0, nowTime.Location())), // locationの設定が必要かも
+		TimeGoal:  transToSimpleTimeFromTime(time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 23, 59, 99, 99, nowTime.Location())),
+		SerialNumber: []string{serialNumber},
+	}
+
+	insertDB(setAttendance)
+
 	return user
 }
 
